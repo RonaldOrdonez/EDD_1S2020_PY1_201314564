@@ -1,0 +1,20 @@
+digraph DictionaryWords{
+rankdir=LR;
+node[shape=box];
+"HOLA"->"MUNDO";
+"HOLA"->"UNO";
+"MUNDO"->"HOY";
+"MUNDO"->"HOLA";
+"HOY"->"LUNES";
+"HOY"->"MUNDO";
+"LUNES"->"HAGO";
+"LUNES"->"HOY";
+"HAGO"->"PRUEBAS";
+"HAGO"->"LUNES";
+"PRUEBAS"->"PROYECTO";
+"PRUEBAS"->"HAGO";
+"PROYECTO"->"UNO";
+"PROYECTO"->"PRUEBAS";
+"UNO"->"HOLA";
+"UNO"->"PROYECTO";
+}
