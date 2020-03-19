@@ -6,44 +6,44 @@ using namespace std;
 
 /******************************************************************************
  ****************************CLASS NODE WORD***********************************
+ *save words read from JSON file
  ******************************************************************************
  */
 
 class NodeWord
 {
-//****************************************
-//DECLARATION OF ATTRIBUTES
-//****************************************
-public:    
+    //****************************************
+    //DECLARATION OF ATTRIBUTES
+    //****************************************
+public:
     string word;
     NodeWord *next;
     NodeWord *previous;
 
-//****************************************
-//DECLARATION OF PUBLIC FUNCTIONS
-//****************************************
+    //****************************************
+    //DECLARATION OF PUBLIC FUNCTIONS
+    //****************************************
 public:
-//****************************************
-//CONTRUCTOR WITHOUT PARAMETERS
-//****************************************
- NodeWord()
+    //****************************************
+    //CONTRUCTOR WITHOUT PARAMETERS
+    //****************************************
+    NodeWord()
     {
-        this->word = "";        
+        this->word = "";
         this->next = NULL;
         this->previous = NULL;
     }
 
-//****************************************
-//CONSTRUCTOR WITH A PARAMETER
-//****************************************
- NodeWord(string word)
-    {        
+    //****************************************
+    //CONSTRUCTOR WITH A PARAMETER
+    //****************************************
+    NodeWord(string word)
+    {
         this->word = word;
         this->next = NULL;
         this->previous = NULL;
     }
 };
-
 
 /******************************************************************************
  ****************************CLASS LIST WORD***********************************
@@ -52,16 +52,16 @@ public:
 
 class ListWords
 {
-//****************************************
-//DECLARATION OF ATTRIBUTES 
-//****************************************
+    //****************************************
+    //DECLARATION OF ATTRIBUTES
+    //****************************************
 public:
- NodeWord *first;
- NodeWord *last;
+    NodeWord *first;
+    NodeWord *last;
 
-//****************************************
-//DECLARATION OF PUBLIC FUNCTIONS
-//****************************************
+    //****************************************
+    //DECLARATION OF PUBLIC FUNCTIONS
+    //****************************************
 public:
     //****************************************
     //CONSTRUCTOR
@@ -77,30 +77,30 @@ public:
     //****************************************
     bool isEmpty()
     {
-        return first==NULL;        
+        return first == NULL;
     }
-    
+
     //****************************************
     //ADD WORD TO THE TOP OF THE LIST
     //****************************************
     void addWord(string word)
     {
-     NodeWord* new_node = new NodeWord(word);
-        
-        if (first == NULL)
+        NodeWord *new_node = new NodeWord(word);
+
+        if (isEmpty())
         {
-            first=new_node;
-            last=new_node;
-            first->next=first;
-            first->previous=last;
+            first = new_node;
+            last = new_node;
+            first->next = first;
+            first->previous = last;
         }
         else
         {
-            last->next=new_node;
-            new_node->previous=last;
+            last->next = new_node;
+            new_node->previous = last;
             first->previous = new_node;
-            new_node->next=first;
-            last=new_node;           
+            new_node->next = first;
+            last = new_node;
         }
     }
 
@@ -109,40 +109,47 @@ public:
     //****************************************
     void showList()
     {
-     NodeWord* aux = first;
-        do
+        if (isEmpty())
         {
-            cout << aux->word << "\n";
-            cout<<"next: "<<aux->next->word<<"\n";
-            cout<<"prev: "<<aux->previous->word<<"\n";
-            cout<<"-------------------- \n";
-            aux = aux->next;
+            cout << "DICCIONARIO DE PALABRAS VACIO \n";
+        }
+        else
+        {
+            NodeWord *aux = first;
+            do
+            {
+                cout << aux->word << "\n";
+                cout << "next: " << aux->next->word << "\n";
+                cout << "prev: " << aux->previous->word << "\n";
+                cout << "-------------------- \n";
+                aux = aux->next;
 
-        } while (aux != first);
-    }  
+            } while (aux != first);
+        }
+    }
 
     //********************************************
     //SHOW IN A PNG PICTURE THE DICTIONARY WORDS
     //********************************************
 
-    void graphDictinary() 
+    void graphDictinary()
     {
-        string scriptGraph;                 
-        if (first == NULL)
+        string scriptGraph;
+        if (isEmpty())
         {
-            scriptGraph = "digraph DictionaryWords{\n node[shape=box];\n node0[label=\"Diccionario Vacio\"];\n }";            
+            scriptGraph = "digraph DictionaryWords{\n node[shape=box];\n node0[label=\"Diccionario Vacio\"];\n }";
         }
         else
         {
-            NodeWord *aux = first; 
-            scriptGraph += "digraph DictionaryWords{\nrankdir=LR;\nnode[style=rounded];\nnode[shape=box];\n";             
+            NodeWord *aux = first;
+            scriptGraph += "digraph DictionaryWords{\nrankdir=LR;\nnode[style=rounded];\nnode[shape=box];\n";
             do
             {
-                scriptGraph += "\""+ aux->word+"\"->\""+aux->next->word+"\";\n";
-                scriptGraph += "\""+ aux->word+"\"->\""+aux->previous->word+"\";\n";
-                aux = aux->next;                
-            }while(aux!=first);
-            scriptGraph +="}\n";
+                scriptGraph += "\"" + aux->word + "\"->\"" + aux->next->word + "\";\n";
+                scriptGraph += "\"" + aux->word + "\"->\"" + aux->previous->word + "\";\n";
+                aux = aux->next;
+            } while (aux != first);
+            scriptGraph += "}\n";
         }
         ofstream myFile;
         myFile.open("DictionaryWords.dot");

@@ -1,0 +1,4 @@
+digraph UsersTree{
+node[style=rounded,shape=box];
+node0[label="NO HAY JUGADORES TODAVIA"];
+}
