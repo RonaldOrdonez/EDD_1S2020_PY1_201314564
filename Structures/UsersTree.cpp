@@ -37,6 +37,8 @@ public:
     }
 };
 
+
+
 /*********************************************************************
  **************CLASS BINARY SERCH TREE********************************
  *********************************************************************
@@ -48,7 +50,13 @@ class TreePlayer
 //*******************************************
 public:
     NodeTree *root;
-    string result;
+    int numberNodes; 
+private:
+    string result;  
+    string script_preorder;     
+    string script_inorder;     
+    string script_posorder;     
+    int countVisit;
 
 //*******************************************
 //DECLARATION OF PUBLIC FUNCTIONS
@@ -61,6 +69,9 @@ public:
     {
         root = NULL;
         result = "";
+        script_preorder = "";
+        numberNodes = 0;
+        countVisit = 0;
     }
 
     //***************************************
@@ -90,6 +101,7 @@ public:
         if (isEmpty())
         {
             root = new_node;
+            numberNodes++;
         }
         //IF ROOT IS NOT EMPTY, SEND CURRENT ROOT AND NEW NODE
         //TO RECURSIVE ADD PLAYER FUNCTION
@@ -99,24 +111,20 @@ public:
         }
     }
 
-    //**********************************************
-    //PREORDER TRAVERSAL
-    //***********************************************
-    void viewPreOrder()
-    {
-        if(isEmpty())
-        {
-            cout<<"Arbol Vacio"<<"\n";
-        }
-        else
-        {
-            preOrder(root);
-        }
-    }
 
+
+    /***********************************************************************************************
+     * *********************************************************************************************
+     *  START GRAPH PREORDER , INORDER, POSORDER
+     ***********************************************************************************************
+     ***********************************************************************************************
+     * */   
+
+    //**********************************************
+    //GRAPH PREORDER TRAVERSAL
+    //***********************************************   
     void graphPreOrderTraverse()
-    {        
-        string script_preorder;              
+    {      
         if (isEmpty())
         {
             script_preorder = "digraph traversePreorder{\n";
@@ -127,38 +135,161 @@ public:
         else
         {            
             script_preorder = "digraph traversePreorder{\nrankdir=LR;\nnode[style=rounded,shape=box,fontsize=20];\n";
-            
-            while (aux->next != NULL)
-            {
-                scriptGraph += "node";
-                scriptGraph += to_string(numNode);
-                scriptGraph += "[label=\"" + to_string(aux->score) + "\"]; \n";
-                scriptGraph += "node" + to_string(numNode) + "->" + "node" + to_string(numNode + 1) + "; \n";
-                numNode++;
-                aux = aux->next;
-            }
-            scriptGraph += "node";
-            scriptGraph += to_string(numNode);
-            scriptGraph += "[label=\"" + to_string(aux->score) + "\"]; \n";
-            scriptGraph += "label=\"Puntaje de " + name + "\";\n";
-            scriptGraph += "}";
+            preOrderGraphRecursive(root); 
+            script_preorder += ";\n";
+            script_preorder += "label=\"Recorrido Preorden\";\nfontsize=25;";
+            script_preorder += "}";
         }
         ofstream myFile;
-        myFile.open("ScoreBoardIndividual.dot");
-        myFile << scriptGraph;
+        myFile.open("traversePreorder.dot");
+        myFile << script_preorder;
         myFile.close();
-        system("dot -Tpng ScoreBoardIndividual.dot -o ScoreBoardIndividual.png");
-        system("shotwell ScoreBoardIndividual.png");             
+        system("dot -Tpng traversePreorder.dot -o traversePreorder.png");
+        system("shotwell traversePreorder.png"); 
+        script_preorder = "";
+        countVisit = 0;
     }
-
-    void preOrderRecursive(NodeTree *root)
+private:
+    void preOrderGraphRecursive(NodeTree *root)
     {
         //root->left->right
-        if (root)
+        if (root!=NULL)
+        {   
+            if(countVisit==numberNodes-1)
+            {
+                script_preorder += root->name;                 
+            }
+            else
+            {
+                script_preorder += root->name +"->";                
+                countVisit++;
+                preOrderGraphRecursive(root->left);
+                preOrderGraphRecursive(root->right);                
+            }
+        }
+    }
+
+    //**********************************************
+    //GRAPH INORDER TRAVERSAL
+    //***********************************************   
+public:
+    void graphInOrderTraverse()
+    {      
+        if (isEmpty())
         {
-            cout << root->name << "->";
-            preOrder(root->left);
-            preOrder(root->right);
+            script_inorder = "digraph traverseInorder{\n";
+            script_inorder += "node[style=rounded,shape=box];\n";
+            script_inorder += "node0[label=\"Arbol Vacio\"];\n";
+            script_inorder += "}";
+        }
+        else
+        {            
+            script_inorder = "digraph traverseInorder{\nrankdir=LR;\nnode[style=rounded,shape=box,fontsize=20];\n";
+            inOrderGraphRecursive(root); 
+            script_inorder += ";\n";
+            script_inorder += "label=\"Recorrido Inorden\";\nfontsize=25;";
+            script_inorder += "}";
+        }
+        ofstream myFile;
+        myFile.open("traverseInorder.dot");
+        myFile << script_inorder;
+        myFile.close();
+        system("dot -Tpng traverseInorder.dot -o traverseInorder.png");
+        system("shotwell traverseInorder.png"); 
+        script_inorder = "";
+        countVisit = 0;
+    }
+private:
+    void inOrderGraphRecursive(NodeTree *root)
+    {
+        //root->left->right
+        if (root!=NULL)
+        {               
+            inOrderGraphRecursive(root->left);
+            if(countVisit==numberNodes-1)
+            {
+                script_inorder += root->name;                                 
+            }
+            else
+            {                
+                script_inorder += root->name +"->";                
+                countVisit++;                  
+            }
+            inOrderGraphRecursive(root->right);                
+        }
+    }
+
+    //**********************************************
+    //GRAPH POSORDER TRAVERSAL
+    //***********************************************   
+public:
+    void graphPosOrderTraverse()
+    {      
+        if (isEmpty())
+        {
+            script_posorder = "digraph traversePosorder{\n";
+            script_posorder += "node[style=rounded,shape=box];\n";
+            script_posorder += "node0[label=\"Arbol Vacio\"];\n";
+            script_posorder += "}";
+        }
+        else
+        {            
+            script_posorder = "digraph traversePosorder{\nrankdir=LR;\nnode[style=rounded,shape=box,fontsize=20];\n";
+            posOrderGraphRecursive(root); 
+            script_posorder += ";\n";
+            script_posorder += "label=\"Recorrido Posorden\";\nfontsize=25;";
+            script_posorder += "}";
+        }
+        ofstream myFile;
+        myFile.open("traversePosorder.dot");
+        myFile << script_posorder;
+        myFile.close();
+        system("dot -Tpng traversePosorder.dot -o traversePosorder.png");
+        system("shotwell traversePosorder.png"); 
+        script_posorder = "";
+        countVisit = 0;
+    }
+private:
+    void posOrderGraphRecursive(NodeTree *root)
+    {
+        //root->left->right
+        if (root!=NULL)
+        {
+            posOrderGraphRecursive(root->left);
+            posOrderGraphRecursive(root->right); 
+            if(countVisit==numberNodes-1)
+            {
+                script_posorder += root->name;                 
+            }
+            else
+            {
+                script_posorder += root->name +"->";                
+                countVisit++;                               
+            }
+        }
+    }
+
+
+    /***********************************************************************************************
+     **********************************************************************************************
+     *  START ONLY TRAVERSE PREORDER , INORDER, POSORDER
+     ***********************************************************************************************
+     ***********************************************************************************************
+     * */
+
+    //**********************************************
+    //PREORDER TRAVERSAL
+    //***********************************************
+public:
+    void viewPreOrder()
+    {
+        if(isEmpty())
+        {
+            cout<<"Arbol Vacio"<<"\n";
+        }
+        else
+        {            
+            preOrder(root);
         }
     }
 
@@ -195,6 +326,7 @@ public:
     //****************************************************
     //GRAPH TREE AN SHOW IT IN A PNG PICTURE 
     //****************************************************
+
     void graphUsersTree()
     {
         if(isEmpty())
@@ -208,7 +340,7 @@ public:
         {
             result += "digraph UsersTree{\n";        
             result += "node[shape=record, height=.1];\n";
-            RecorrerNodosParaGraficarABB(root);
+            recursiveGraphTree(root);
             result += "fontsize=15;\n";
             result += "}";
         }
@@ -237,7 +369,7 @@ private:
     //****************************************************
     //RECURSIVE FUNCTION TO TRAVERSE TREE
     //****************************************************
-    void RecorrerNodosParaGraficarABB(NodeTree *root_)
+    void recursiveGraphTree(NodeTree *root_)
     {
         if (root_ != NULL)
         {
@@ -251,9 +383,9 @@ private:
                 result += "\"" + root_->name + "\"" + ":f2 -> \"" + root_->right->name + "\":f1; \n";                
             }
             //CALL RECURSIVE FUNCTION TO TRAVERSE LEFT SUBTREE
-            RecorrerNodosParaGraficarABB(root_->left);
+            recursiveGraphTree(root_->left);
             //CALL RECURSIVE FUNCTION TO TRAVERSE RIGHT SUBTREE
-            RecorrerNodosParaGraficarABB(root_->right);
+            recursiveGraphTree(root_->right);
         }
     }
 
@@ -310,6 +442,7 @@ private:
             else //if left son doesn't exist, assign new node as left son
             {
                 root_sub->left = new_node;
+                numberNodes++;
             }
         }
 
@@ -322,6 +455,7 @@ private:
             else //if right son doesn't exist, assign new node as right son
             {
                 root_sub->right = new_node;
+                numberNodes++;
             }
         }
         else
@@ -335,13 +469,13 @@ private:
     //SHOW NODES IN CONSOLE ORDERED IN PREORDER FORM
     //*******************************************************
     void preOrder(NodeTree *root)
-    {
+    {        
         //root->left->right
-        if (root)
-        {
-            cout << root->name << "->";
+        if (root!=NULL)
+        {   
+            cout << root->name << "->";                
             preOrder(root->left);
-            preOrder(root->right);
+            preOrder(root->right);                            
         }
     }
 
@@ -351,6 +485,7 @@ private:
     void inOrder(NodeTree *root)
     {
         //left->root->right
+
         if (root)
         {
             inOrder(root->left);
@@ -374,10 +509,12 @@ private:
     }
 };
 
+/*
 
 int main()
 {
-    TreePlayer *tree = new TreePlayer();
+    TreePlayer *tree = new TreePlayer();    
+    //add players to the tree
     tree->addPlayer("marina");
     tree->addPlayer("carla");
     tree->addPlayer("eugenia");
@@ -388,12 +525,31 @@ int main()
     tree->addPlayer("FERNANDA");
     tree->addPlayer("ximena");
     tree->addPlayer("jonas");
-    tree->addPlayer("Victor");
-    tree->addPlayer("Esteban");
-    tree->addPlayer("Victor");
+    tree->addPlayer("Victor"); 
+    tree->addPlayer("Esteban");   
+    
+    //show number nodes
+    cout <<"Numero de Nodos: "<< tree->numberNodes;
+    cout << "\n";
+    
+    //show in console all types orders
+    tree->viewPreOrder();
     cout << "\n";
     tree->viewInOrder();
     cout << "\n";
-    tree->graphUsersTree();
+    tree->viewPosOrder();
+    cout << "\n";
+    
+    //graph in png picture tree's nodes
+    cout << "\n";
+    tree->graphUsersTree();    
+    cout << "\n";
+    
+    //graph in png picture pre,in,pos order traverse
+    tree->graphPreOrderTraverse();
+    tree->graphInOrderTraverse();
+    tree->graphPosOrderTraverse();        
+    cout << "\n";
+    
     return 0;
-}
+}*/

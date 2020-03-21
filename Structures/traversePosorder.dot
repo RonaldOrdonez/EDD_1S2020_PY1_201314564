@@ -1,0 +1,6 @@
+digraph traversePosorder{
+rankdir=LR;
+node[style=rounded,shape=box,fontsize=20];
+ana->Esteban->jonas->FERNANDA->eugenia->carla->norma->Victor->ximena->zara->roman->marina;
+label="Recorrido Posorden";
+fontsize=25;}
