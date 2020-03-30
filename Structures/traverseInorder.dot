@@ -1,6 +1,0 @@
-digraph traverseInorder{
-rankdir=LR;
-node[style=rounded,shape=box,fontsize=20];
-ana->carla->Esteban->eugenia->FERNANDA->jonas->marina->norma->roman->Victor->ximena->zara;
-label="Recorrido Inorden";
-fontsize=25;}

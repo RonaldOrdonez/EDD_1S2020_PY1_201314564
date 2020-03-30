@@ -1,6 +1,0 @@
-digraph traversePreorder{
-rankdir=LR;
-node[style=rounded,shape=box,fontsize=20];
-marina->carla->ana->eugenia->Esteban->FERNANDA->jonas->roman->norma->zara->ximena->Victor;
-label="Recorrido Preorden";
-fontsize=25;}
