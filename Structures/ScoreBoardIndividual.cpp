@@ -6,18 +6,18 @@
 using namespace std;
 
 /******************************************************************************
- ****************************CLASS NodeScoreBoard******************************
+ ****************************CLASS NodeIndividualScore******************************
  *store the information necesary
  ******************************************************************************
  */
-class NodeScoreboard
+class NodeIndividualScore
 {
     //****************************************
     //DEFINITION OF ATTRIBUTES OF CLASS
     //****************************************
 public:
     int score;
-    NodeScoreboard *next;
+    NodeIndividualScore *next;
 
     //****************************************
     //DEFINITION OF PUBLIC FUNCTIONS
@@ -26,7 +26,7 @@ public:
     //****************************************
     //CONSTRUCTOR WITHOUT PARAMETERS
     //****************************************
-    NodeScoreboard()
+    NodeIndividualScore()
     {
         score = 0;
         next = NULL;
@@ -35,7 +35,7 @@ public:
     //****************************************
     //CONSTRUCTOR WITH PARAMETERS
     //****************************************
-    NodeScoreboard(int score)
+    NodeIndividualScore(int score)
     {
         this->score = score;
         this->next = NULL;
@@ -47,13 +47,13 @@ public:
  * THIS LIST IS A SCOREBOARD INDIVIDUAL FOR EACH PLAYER
  ******************************************************************************
  */
-class Scoreboard
+class ScoreboardIndividual
 {
     //****************************************
     //DEFINITION OF ATTRIBUTES OF CLASS
     //****************************************
 public:
-    NodeScoreboard *first;
+    NodeIndividualScore *first;
     string name;
 
     //****************************************
@@ -63,10 +63,16 @@ public:
     //************************************
     //CONTRUCTOR
     //************************************
-    Scoreboard(string name)
+    ScoreboardIndividual(string name)
     {
         first = NULL;
         this->name = name;
+    }
+
+    ScoreboardIndividual()
+    {
+        first = NULL;
+        this->name = "";
     }
 
     //************************************
@@ -82,9 +88,9 @@ public:
     //insert node in order of mayor
     // to lowest point
     //************************************
-    void addPlayer(int score)
+    void addScore(int score)
     {
-        NodeScoreboard *new_node = new NodeScoreboard(score);
+        NodeIndividualScore *new_node = new NodeIndividualScore(score);
         //if list is empty, insert new node in first position
         if (isEmpty())
         {
@@ -93,7 +99,7 @@ public:
         //if list is not empty
         else
         {
-            //verify if socre of new node is bigger that first node
+            //verify if score of new node is bigger that first node
             //if is true insert node before to first
             if (score > first->score)
             {
@@ -104,7 +110,7 @@ public:
             //until you find your correct position
             else
             {
-                NodeScoreboard *tmp = first;
+                NodeIndividualScore *tmp = first;
                 bool flag = false;
                 while ((tmp->next != NULL) && flag == false)
                 {
@@ -140,7 +146,7 @@ public:
         }
         else
         {
-            NodeScoreboard *aux = first;
+            NodeIndividualScore *aux = first;
             while (aux->next != NULL)
             {
                 cout << aux->score << "->";
@@ -168,7 +174,7 @@ public:
         }
         else
         {
-            NodeScoreboard *aux = first;
+            NodeIndividualScore *aux = first;
             scriptGraph = "digraph ScoreBoardIndividual{\nrankdir=LR;\nnode[style=rounded,shape=box,fontsize=30];\n";
             while (aux->next != NULL)
             {
@@ -197,16 +203,17 @@ public:
 /*
 int main()
 {
-    Scoreboard *list=new Scoreboard("Fernanda");
-    list->addPlayer(8);
-    list->addPlayer(6);
-    list->addPlayer(7);
-    list->addPlayer(10);
-    list->addPlayer(1);
-    list->addPlayer(8);
-    list->addPlayer(90);
-    list->addPlayer(45);
+    ScoreboardIndividual *list=new ScoreboardIndividual("Fernanda");
+    list->addScore(8);
+    list->addScore(6);
+    list->addScore(7);
+    list->addScore(10);
+    list->addScore(1);
+    list->addScore(8);
+    list->addScore(90);
+    list->addScore(45);
     list->printScoreboard();
     list->graphScoreIndividual();
     return 0;
-}*/
+}
+*/

@@ -6,11 +6,11 @@
 using namespace std;
 
 /******************************************************************************
- ****************************CLASS NodeScoreBoard******************************
+ ****************************CLASS NodeGeneralScore******************************
  *store the information necesary for general scoreboard
  ******************************************************************************
  */
-class NodeScoreboard
+class NodeGeneralScore
 {
     //****************************************
     //DEFINITION OF ATTRIBUTES OF CLASS
@@ -18,7 +18,7 @@ class NodeScoreboard
 public:
     int score;
     string player;
-    NodeScoreboard *next;
+    NodeGeneralScore *next;
     //****************************************
     //DEFINITION OF PUBLIC FUNCTIONS
     //****************************************
@@ -26,7 +26,7 @@ public:
     //****************************************
     //CONSTRUCTOR WITHOUT PARAMETERS
     //****************************************
-    NodeScoreboard()
+    NodeGeneralScore()
     {
         score = 0;
         player = "";
@@ -35,7 +35,7 @@ public:
     //****************************************
     //CONSTRUCTOR WITH PARAMETERS
     //****************************************
-    NodeScoreboard(int score, string player)
+    NodeGeneralScore(int score, string player)
     {
         this->score = score;
         this->player = player;
@@ -43,19 +43,20 @@ public:
     }
 };
 
+
 /******************************************************************************
  ****************************CLASS SCOREBOARD**********************************
  * THIS LIST IS THE SCRABBLE GENERAL SCORE
  * ****************************************************************************
  */
-class Scoreboard
+class ScoreboardGeneral
 {
 
     //****************************************
     //DEFINITION OF ATTRIBUTES OF CLASS
     //****************************************
 public:
-    NodeScoreboard *first;
+    NodeGeneralScore *first;
 
     //****************************************
     //DEFINITION OF PUBLIC FUNCTIONS
@@ -64,7 +65,7 @@ public:
     //*************************************
     //CONTRUCTOR
     //*************************************
-    Scoreboard()
+    ScoreboardGeneral()
     {
         first = NULL;
     }
@@ -82,7 +83,7 @@ public:
     //*************************************
     void addPlayer(int score, string player)
     {
-        NodeScoreboard *new_node = new NodeScoreboard(score, player);
+        NodeGeneralScore *new_node = new NodeGeneralScore(score, player);
         if (isEmpty())
         {
             first = new_node;
@@ -96,7 +97,7 @@ public:
             }
             else
             {
-                NodeScoreboard *tmp = first;
+                NodeGeneralScore *tmp = first;
                 bool flag = false;
                 while ((tmp->next != NULL) && flag == false)
                 {
@@ -131,7 +132,7 @@ public:
         }
         else
         {
-            NodeScoreboard *aux = first;
+            NodeGeneralScore *aux = first;
             while (aux->next != NULL)
             {
                 cout << aux->score;
@@ -164,7 +165,7 @@ public:
         }
         else
         {
-            NodeScoreboard *aux = first;
+            NodeGeneralScore *aux = first;
             scriptGraph = "digraph ScoreBoardGeneral{\nrankdir=LR;\nnode[style=rounded,shape=box];\n";
             scriptGraph += "label=\"Scoreboard del Juego\";\n";
             while (aux->next != NULL)
@@ -193,7 +194,7 @@ public:
 /*
 int main()
 {
-    Scoreboard *list=new Scoreboard();
+    ScoreboardGeneral *list=new ScoreboardGeneral();
     list->addPlayer(8,"Juan");
     list->addPlayer(6,"Pedro");
     list->addPlayer(7,"Luis");
@@ -204,4 +205,5 @@ int main()
     list->printScoreboard();
     list->graphScoreGeneral();
     return 0;
-}*/
+}
+*/

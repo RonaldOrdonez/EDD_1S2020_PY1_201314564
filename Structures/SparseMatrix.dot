@@ -1,0 +1,45 @@
+digraph{
+ rankdir=TB;
+ node[shape=rectangle];
+ graph[nodesep=0.5];
+
+MATRIZ->C8[dir=both];
+C8->C9[dir=both];
+C9->C10[dir=both];
+{rank=same; MATRIZ C8 C9 C10 }
+
+MATRIZ->F4[dir=both];
+F4->F5[dir=both];
+F5->F6[dir=both];
+F6->F7[dir=both];
+
+F4->N104[constraint=false,dir=both];
+N104[label="H"];
+{rank=same; F4 N104 }
+
+F5->N85[constraint=false,dir=both];
+N85[label="O"];
+N85->N95[constraint=false,dir=both];
+N95[label="S"];
+N95->N105[constraint=false,dir=both];
+N105[label="O"];
+{rank=same; F5 N85 N95 N105 }
+
+F6->N106[constraint=false,dir=both];
+N106[label="L"];
+{rank=same; F6 N106 }
+
+F7->N107[constraint=false,dir=both];
+N107[label="A"];
+{rank=same; F7 N107 }
+
+C8->N85[dir=both];
+
+C9->N95[dir=both];
+
+C10->N104[dir=both];
+N104->N105[dir=both];
+N105->N106[dir=both];
+N106->N107[dir=both];
+
+}

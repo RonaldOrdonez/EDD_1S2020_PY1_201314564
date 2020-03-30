@@ -3,8 +3,49 @@
 #include <string>
 #include <sstream>
 #include <fstream>
-#include "NodeCoin.cpp"
 using namespace std;
+
+class NodeCoin
+{
+
+//****************************************
+//DEFINITION OF ATTRIBUTES OF CLASS
+//****************************************
+public:
+    string letter;
+    int value;
+    NodeCoin *next;
+    NodeCoin *previous;
+
+//****************************************
+//DEFINITION OF PUBLIC FUNCTIONS
+//****************************************
+public:
+
+    //***********************************
+    //CONSTRUCTOR WITHOUT PARAMETERS
+    //***********************************
+    NodeCoin()
+    {
+        letter="";
+        value=0;
+        next = NULL;
+        previous = NULL;
+    }
+
+    //***********************************
+    //CONSTRUCTOR WITH 2 PARAMETERS
+    //***********************************
+    NodeCoin(string letter, int value)
+    {
+        this->letter=letter;
+        this->value = value;
+        this->next=NULL;
+        this->previous = NULL;
+    }
+};
+
+
 
 /******************************************************************************
  ************************CLASS LIST COIN PLAYER********************************
@@ -59,6 +100,79 @@ public:
             }
             tmp->next = new_node;
             new_node->previous = tmp;
+        }
+    }
+
+    NodeCoin *returnCoin(string letter)
+    {
+        if (isEmpty())
+        {
+            cout << "SIN FICHAS" << endl;
+        }
+        else
+        {
+            NodeCoin *tmp = first;
+            if (first->letter.compare(letter) == 0)
+            {
+                if(first->next==NULL)
+                {
+                    first=NULL;
+
+                    tmp->next = NULL;
+                    tmp->previous = NULL;
+                    return tmp;
+                }
+                else
+                {
+                    first = first->next;
+                    first->previous = NULL;
+
+                    tmp->next = NULL;
+                    tmp->previous = NULL;
+                    return tmp;                    
+                }
+            }
+            else
+            {
+                int flag = 0;
+                while (tmp->next != NULL && flag == 0)
+                {
+                    if (tmp->next->letter.compare(letter) == 0)
+                    {
+                        NodeCoin *aux = tmp->next;
+                        NodeCoin *aux2 = tmp->next;
+                        if (tmp->next->next == NULL)
+                        {
+                            flag = 1;
+                            tmp->next = NULL;
+
+                            aux2->next = NULL;
+                            aux2->previous = NULL;
+
+                            return aux2;
+                        }
+                        else
+                        {
+                            flag = 1;
+                            tmp->next = aux->next;
+                            aux->next->previous = tmp;
+
+                            aux2->next = NULL;
+                            aux2->previous = NULL;
+                            return aux2;
+                        }
+                    }
+                    else
+                    {
+                        tmp = tmp->next;
+                    }
+                }
+                if(flag==0)
+                {
+                    NodeCoin* fail= new NodeCoin("2",0);
+                    return fail;                    
+                }
+            }
         }
     }
 
@@ -154,15 +268,60 @@ public:
 int main()
 {
     ListCoinPLayer *list = new ListCoinPLayer();
-    list->addCoin("A",2);
-    list->addCoin("K",3);
-    list->addCoin("L",9);
-    list->addCoin("T",8);
-    list->addCoin("Z",7);
-    list->addCoin("E",6);
-    list->addCoin("F",3);    
+    list->addCoin("C", 2);
+    list->addCoin("K", 3);
+    list->addCoin("O", 9);
+    list->addCoin("T", 8);
+    list->addCoin("S", 7);
+    list->addCoin("E", 6);
+    list->addCoin("A", 3);
+    cout << "\n";
+    cout << "\n";
+    list->showList();
+    //list->graphListOfIndividualCoin();
+    NodeCoin *test = new NodeCoin();
+    test = list->returnCoin("C");
+    cout << "\n";
+    cout << "\n";
+    cout << "encontrada: " << test->letter << endl;
+    cout << "\n";
+    cout << "\n";
+    test = list->returnCoin("O");
+    cout << "\n";
+    cout << "\n";
+    cout << "encontrada: " << test->letter << endl;
+    cout << "\n";
+    cout << "\n";
+    test = list->returnCoin("S");
+    cout << "\n";
+    cout << "\n";
+    cout << "encontrada: " << test->letter << endl;
+    cout << "\n";
+    cout << "\n";
+    test = list->returnCoin("A");
+    cout << "\n";
+    cout << "\n";
+    cout << "encontrada: " << test->letter << endl;
+    cout << "\n";
+    cout << "\n";
+    test=list->returnCoin("K");
+    cout<<"\n";
+    cout<<"\n";
+    cout<< "encontrada: "<<test->letter<<endl;
+    cout<<"\n";
+    cout<<"\n";
+    test=list->returnCoin("T");
+    cout<<"\n";
+    cout<<"\n";
+    cout<< "encontrada: "<<test->letter<<endl;
+    cout<<"\n";
+    cout<<"\n";
+    test=list->returnCoin("E");
+    cout<<"\n";
+    cout<<"\n";
+    cout<< "encontrada: "<<test->letter<<endl;
+    cout<<"\n";
     cout<<"\n";
     list->showList();
-    list->graphListOfIndividualCoin();
     return 0;
 }*/

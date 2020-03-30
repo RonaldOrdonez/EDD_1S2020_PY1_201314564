@@ -2,10 +2,52 @@
 #include <stdlib.h>
 #include <string>
 #include <fstream>
-#include "NodeCoin.cpp"
 #include <sstream>
 #include <fstream>
 using namespace std;
+
+class NodeCoinQueue
+{
+
+//****************************************
+//DEFINITION OF ATTRIBUTES OF CLASS
+//****************************************
+public:
+    string letter;
+    int value;
+    NodeCoinQueue *next;
+    NodeCoinQueue *previous;
+
+//****************************************
+//DEFINITION OF PUBLIC FUNCTIONS
+//****************************************
+public:
+
+    //***********************************
+    //CONSTRUCTOR WITHOUT PARAMETERS
+    //***********************************
+    NodeCoinQueue()
+    {
+        letter="";
+        value=0;
+        next = NULL;
+        previous = NULL;
+    }
+
+    //***********************************
+    //CONSTRUCTOR WITH 2 PARAMETERS
+    //***********************************
+    NodeCoinQueue(string letter, int value)
+    {
+        this->letter=letter;
+        this->value = value;
+        this->next=NULL;
+        this->previous = NULL;
+    }
+};
+
+
+
 
 /******************************************************************************
  ****************************CLASS QUEUE COIN**********************************
@@ -18,7 +60,7 @@ class QueueCoin
     //DEFINITION OF ATTRIBUTES OF CLASS
     //****************************************
 public:
-    NodeCoin *first;
+    NodeCoinQueue *first;
 
     //****************************************
     //DEFINITION OF PUBLIC FUNCTIONS
@@ -44,14 +86,14 @@ public:
     //****************************************
     void enqueueCoin(string letter, int value)
     {
-        NodeCoin *new_node = new NodeCoin(letter, value);
+        NodeCoinQueue *new_node = new NodeCoinQueue(letter, value);
         if (isEmpty())
         {
             first = new_node;
         }
         else
         {
-            NodeCoin *tmp = first;
+            NodeCoinQueue *tmp = first;
             while (tmp->next != NULL)
             {
                 tmp = tmp->next;
@@ -64,9 +106,9 @@ public:
     //****************************************
     //DEQUEUE A NODE AND RETURN THE NODE
     //****************************************
-    NodeCoin *dequeueCoin()
+    NodeCoinQueue *dequeueCoin()
     {
-        NodeCoin *tmp = first;
+        NodeCoinQueue *tmp = first;
         first = first->next;
         return tmp;
     }
@@ -82,7 +124,7 @@ public:
         }
         else
         {
-            NodeCoin *aux = first;
+            NodeCoinQueue *aux = first;
             while (aux->next != NULL)
             {
                 cout << aux->letter << ",";
@@ -115,7 +157,7 @@ public:
         }
         else
         {
-            NodeCoin *aux = first;
+            NodeCoinQueue *aux = first;
             scriptGraph = "digraph QueueCoins{\n";
             scriptGraph += "rankdir=TB; \n";
             scriptGraph += "node[style=rounded];\n";
@@ -162,7 +204,7 @@ int main()
     cout<<"\n";
     list->showList();
     list->graphQueue();
-    //NodeCoin* pop = list->dequeueCoin();
+    //NodeCoinQueue* pop = list->dequeueCoin();
     //cout<<"Nodo sacado: "<<pop->letter<<endl;
     //list->showList();
     return 0;

@@ -55,7 +55,7 @@ class ListWords
     //****************************************
     //DECLARATION OF ATTRIBUTES
     //****************************************
-public:
+private:
     NodeWord *first;
     NodeWord *last;
 
@@ -107,6 +107,7 @@ public:
     //****************************************
     //SHOW ELEMENTS OF THE LIST
     //****************************************
+private:
     void showList()
     {
         if (isEmpty())
@@ -131,7 +132,7 @@ public:
     //********************************************
     //SHOW IN A PNG PICTURE THE DICTIONARY WORDS
     //********************************************
-
+public:
     void graphDictinary()
     {
         string scriptGraph;

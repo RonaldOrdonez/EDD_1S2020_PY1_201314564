@@ -1,0 +1,25 @@
+digraph DictionaryWords{
+rankdir=LR;
+node[style=rounded];
+node[shape=box];
+"hola"->"mundo";
+"hola"->"diccionario";
+"mundo"->"proyecto";
+"mundo"->"hola";
+"proyecto"->"oso";
+"proyecto"->"mundo";
+"oso"->"murcielago";
+"oso"->"proyecto";
+"murcielago"->"cara";
+"murcielago"->"oso";
+"cara"->"pizza";
+"cara"->"murcielago";
+"pizza"->"yate";
+"pizza"->"cara";
+"yate"->"mascara";
+"yate"->"pizza";
+"mascara"->"diccionario";
+"mascara"->"yate";
+"diccionario"->"hola";
+"diccionario"->"mascara";
+}
