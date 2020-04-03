@@ -159,7 +159,7 @@ public:
         {
             NodeCoinQueue *aux = first;
             scriptGraph = "digraph QueueCoins{\n";
-            scriptGraph += "rankdir=TB; \n";
+            scriptGraph += "rankdir=LR; \n";
             scriptGraph += "node[style=rounded];\n";
             scriptGraph += "node[shape=record];\n";
             while (aux->next != NULL)

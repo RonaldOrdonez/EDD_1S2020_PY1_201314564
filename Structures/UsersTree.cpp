@@ -4,6 +4,198 @@
 #include <fstream>
 
 using namespace std;
+
+/******************************************************************************
+ ****************************CLASS NodeIndividualScore******************************
+ *store the information necesary
+ ******************************************************************************
+ */
+
+class NodeIndividualScore
+{
+    //****************************************
+    //DEFINITION OF ATTRIBUTES OF CLASS
+    //****************************************
+public:
+    int score;
+    NodeIndividualScore *next;
+
+    //****************************************
+    //DEFINITION OF PUBLIC FUNCTIONS
+    //****************************************
+public:
+    //****************************************
+    //CONSTRUCTOR WITHOUT PARAMETERS
+    //****************************************
+    NodeIndividualScore()
+    {
+        score = 0;
+        next = NULL;
+    }
+
+    //****************************************
+    //CONSTRUCTOR WITH PARAMETERS
+    //****************************************
+    NodeIndividualScore(int score)
+    {
+        this->score = score;
+        this->next = NULL;
+    }
+};
+
+/******************************************************************************
+ ****************************CLASS SCOREBOARD**********************************
+ * THIS LIST IS A SCOREBOARD INDIVIDUAL FOR EACH PLAYER
+ ******************************************************************************
+ */
+class scoreIndividual
+{
+    //****************************************
+    //DEFINITION OF ATTRIBUTES OF CLASS
+    //****************************************
+public:
+    NodeIndividualScore *first;
+    string name;
+
+    //****************************************
+    //DEFINITION OF PUBLIC FUNCTIONS
+    //****************************************
+public:
+    //************************************
+    //CONTRUCTOR
+    //************************************    
+
+    scoreIndividual()
+    {
+        first = NULL;
+        this->name = "";
+    }
+
+    //************************************
+    //VERIFY IF LIST IS EMPTY
+    //************************************
+    bool isEmpty()
+    {
+        return first == NULL;
+    }
+
+    //************************************
+    //SORT INSERT
+    //insert node in order of mayor
+    // to lowest point
+    //************************************
+    void addScore(int score)
+    {
+        NodeIndividualScore *new_node = new NodeIndividualScore(score);
+        //if list is empty, insert new node in first position
+        if (isEmpty())
+        {
+            first = new_node;
+        }
+        //if list is not empty
+        else
+        {
+            //verify if score of new node is bigger that first node
+            //if is true insert node before to first
+            if (score > first->score)
+            {
+                new_node->next = first;
+                first = new_node;
+            }
+            //if not go through to the list comparing node for node
+            //until you find your correct position
+            else
+            {
+                NodeIndividualScore *tmp = first;
+                bool flag = false;
+                while ((tmp->next != NULL) && flag == false)
+                {
+                    if (score > tmp->next->score)
+                    {
+                        new_node->next = tmp->next;
+                        tmp->next = new_node;
+                        flag = true;
+                    }
+                    else
+                    {
+                        tmp = tmp->next;
+                    }
+                }
+                //insert new node until the last list
+                if (flag == false)
+                {
+                    tmp->next = new_node;
+                    //new_node->next=NULL;
+                }
+            }
+        }
+    }
+
+    //**************************************************
+    //SHOW IN CONSOLE THE LIST IN ORDER
+    //**************************************************
+    void printScoreboard()
+    {
+        if (isEmpty())
+        {
+            cout << "PUNTAJE INDIVIDUAL VACIO \n";
+        }
+        else
+        {
+            NodeIndividualScore *aux = first;
+            while (aux->next != NULL)
+            {
+                cout << aux->score << "->";
+                aux = aux->next;
+            }
+            cout << aux->score;
+            cout << "\n";
+        }
+    }
+
+    //***************************************************
+    //GRAPH THE LIST IN A PNG PICTURE
+    //***************************************************
+    void graphScoreIndividual()
+    {
+        string scriptGraph;
+        int numNode = 0;
+
+        if (isEmpty())
+        {
+            scriptGraph = "digraph ScoreBoardIndividual{\n";
+            scriptGraph += "node[style=rounded,shape=box];\n";
+            scriptGraph += "node0[label=\"USUARIO SIN PUNTAJES\"];\n";
+            scriptGraph += "}";
+        }
+        else
+        {
+            NodeIndividualScore *aux = first;
+            scriptGraph = "digraph ScoreBoardIndividual{\nrankdir=LR;\nnode[style=rounded,shape=box,fontsize=30];\n";
+            while (aux->next != NULL)
+            {
+                scriptGraph += "node";
+                scriptGraph += to_string(numNode);
+                scriptGraph += "[label=\"" + to_string(aux->score) + "\"]; \n";
+                scriptGraph += "node" + to_string(numNode) + "->" + "node" + to_string(numNode + 1) + "; \n";
+                numNode++;
+                aux = aux->next;
+            }
+            scriptGraph += "node";
+            scriptGraph += to_string(numNode);
+            scriptGraph += "[label=\"" + to_string(aux->score) + "\"]; \n";
+            scriptGraph += "label=\"Puntaje de " + name + "\";\n";
+            scriptGraph += "}";
+        }
+        ofstream myFile;
+        myFile.open("ScoreBoardIndividual.dot");
+        myFile << scriptGraph;
+        myFile.close();
+        system("dot -Tpng ScoreBoardIndividual.dot -o ScoreBoardIndividual.png");
+        system("shotwell ScoreBoardIndividual.png");
+    }
+};
+
 /***********************************************************************
  * ***** CLASS NODE TREE THAT SAVE INFO AND POINT NEXT NODES
  * *********************************************************************
@@ -12,8 +204,9 @@ class NodeTree
 {
 public:
     string name;
+    scoreIndividual *list;
     NodeTree *left;
-    NodeTree *right;
+    NodeTree *right;        
 
 public:
     //****************************************************
@@ -23,7 +216,8 @@ public:
     {
         name = "";
         left = NULL;
-        right = NULL;
+        right = NULL;    
+        list = new scoreIndividual();
     }
 
     //****************************************************
@@ -33,10 +227,10 @@ public:
     {
         this->name = name;
         this->left = NULL;
-        this->right = NULL;
+        this->right = NULL;        
+        list = new scoreIndividual();
     }
 };
-
 
 
 /*********************************************************************
@@ -111,6 +305,61 @@ public:
         }
     }
 
+    //***************************************
+    //Search a exists name
+    //***************************************
+    int serchPlayer(string name)
+    {
+        int res;
+        NodeTree* n;
+        n=recursiveSearchPlayer(root, name);
+        if(n==NULL)
+        {
+            //cout<<"nombre no existe"<<endl;
+            res=0; //if name doen's exist return 0
+        }
+        else
+        {
+            //cout<<"nombre ya existe"<<endl;
+            res=1; //if name exists return 1
+        }        
+        return res;       
+    }
+
+    //***************************************
+    //return name of node if exist
+    //***************************************
+    string getName(string name)
+    {
+        string res;
+        NodeTree* node_res;
+        node_res=recursiveSearchPlayer(root, name);
+        res = node_res->name;
+
+        return res;       
+    }
+
+private:
+    NodeTree* recursiveSearchPlayer(NodeTree *root, string nameSearch)
+    {
+        if(!root)
+        {
+            return NULL;
+        }
+        else if(checkAlphabeticalOrder(nameSearch,root->name)==0)
+        {
+            return root;
+        }        
+        else if(checkAlphabeticalOrder(nameSearch,root->name)==1)
+        {
+            return recursiveSearchPlayer(root->right, nameSearch);
+        }
+        else
+        {
+            return recursiveSearchPlayer(root->left, nameSearch);
+        }       
+    }
+
 
 
     /***********************************************************************************************
@@ -120,9 +369,10 @@ public:
      ***********************************************************************************************
      * */   
 
-    //**********************************************
+    //***********************************************
     //GRAPH PREORDER TRAVERSAL
-    //***********************************************   
+    //***********************************************
+public:   
     void graphPreOrderTraverse()
     {      
         if (isEmpty())
@@ -280,7 +530,7 @@ private:
     //**********************************************
     //PREORDER TRAVERSAL
     //***********************************************
-public:
+private:
     void viewPreOrder()
     {
         if(isEmpty())
@@ -326,7 +576,7 @@ public:
     //****************************************************
     //GRAPH TREE AN SHOW IT IN A PNG PICTURE 
     //****************************************************
-
+public:
     void graphUsersTree()
     {
         if(isEmpty())
@@ -460,8 +710,7 @@ private:
         }
         else
         {
-            cout << "NODE ALREADY EXIST"
-                 << "\n";
+            //cout << "NODE ALREADY EXIST"<< "\n";
         }
     }
 
@@ -509,8 +758,8 @@ private:
     }
 };
 
-/*
 
+/*
 int main()
 {
     TreePlayer *tree = new TreePlayer();    
@@ -522,6 +771,24 @@ int main()
     tree->addPlayer("ana");
     tree->addPlayer("norma");
     tree->addPlayer("zara");
+    tree->viewInOrder();
+    cout<<"\n------\n";
+    //tree->serchPlayer("raul");
+    //cout<<"\n";
+   
+   string buscar="fernanda";
+   if(tree->serchPlayer(buscar)==1)
+   {    
+       cout<<"no existe usuario: "<<buscar<<endl;
+   }   
+   else
+   {
+       cout<<"ya existe usuario: "<<buscar<<endl;
+   }   
+   tree->addPlayer("fernanda");
+   tree->viewInOrder();
+   cout<<"\n------\n";
+    
     tree->addPlayer("FERNANDA");
     tree->addPlayer("ximena");
     tree->addPlayer("jonas");

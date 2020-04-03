@@ -1,0 +1,6 @@
+digraph traversePosorder{
+rankdir=LR;
+node[style=rounded,shape=box,fontsize=20];
+luis34->hernan->felipe->ana->zara->marcos;
+label="Recorrido Posorden";
+fontsize=25;}
