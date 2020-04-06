@@ -16,7 +16,7 @@ public:
     string letter;
     int value;
     NodeCoinQueue *next;
-    NodeCoinQueue *previous;
+    NodeCoinQueue *previous;   
 
 //****************************************
 //DEFINITION OF PUBLIC FUNCTIONS
@@ -61,7 +61,8 @@ class QueueCoin
     //****************************************
 public:
     NodeCoinQueue *first;
-
+private:
+    int numCoins;
     //****************************************
     //DEFINITION OF PUBLIC FUNCTIONS
     //****************************************
@@ -72,6 +73,16 @@ public:
     QueueCoin()
     {
         first = NULL;
+        numCoins=0;
+    }
+
+    //****************************************
+    //clean queue
+    //****************************************
+    void clearOut()
+    {
+        first=NULL;
+        numCoins=0;
     }
     //****************************************
     //RETURN TRUE IF LIST IS EMPTY
@@ -79,6 +90,13 @@ public:
     bool isEmpty()
     {
         return first == NULL;
+    }
+    //****************************************
+    //RETURN num elements
+    //****************************************
+    int numElements()
+    {
+        return numCoins;
     }
 
     //****************************************
@@ -90,6 +108,7 @@ public:
         if (isEmpty())
         {
             first = new_node;
+            numCoins++;
         }
         else
         {
@@ -99,6 +118,7 @@ public:
                 tmp = tmp->next;
             }
             tmp->next = new_node;
+            numCoins++;
             //new_node->previous=tmp;
         }
     }
@@ -110,6 +130,7 @@ public:
     {
         NodeCoinQueue *tmp = first;
         first = first->next;
+        numCoins--;
         return tmp;
     }
 

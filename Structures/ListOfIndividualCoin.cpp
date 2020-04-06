@@ -14,6 +14,7 @@ class NodeCoin
 public:
     string letter;
     int value;
+    bool visitado;
     NodeCoin *next;
     NodeCoin *previous;
 
@@ -29,6 +30,7 @@ public:
     {
         letter="";
         value=0;
+        visitado=false;
         next = NULL;
         previous = NULL;
     }
@@ -40,6 +42,7 @@ public:
     {
         this->letter=letter;
         this->value = value;
+        this->visitado = false;
         this->next=NULL;
         this->previous = NULL;
     }
@@ -59,7 +62,7 @@ class ListCoinPLayer
     //DEFINITION OF ATTRIBUTES OF CLASS
     //****************************************
 public:
-    NodeCoin *first;
+    NodeCoin *first;       
 
     //****************************************
     //DEFINITION OF PUBLIC FUNCTIONS
@@ -71,6 +74,14 @@ public:
     ListCoinPLayer()
     {
         first = NULL;
+    }
+
+    //************************************
+    //RETURN TRUE IS LIST IS EMPTY
+    //************************************
+    void clearOut()
+    {       
+        first=NULL;
     }
 
     //************************************
@@ -103,11 +114,38 @@ public:
         }
     }
 
+    int checkLetter(char letter)
+    {
+        int response=0;
+        char l;
+        if (isEmpty())
+        {
+            response=0;
+        }
+        else
+        {
+            NodeCoin *aux = first;
+            while(aux != NULL )
+            {
+                l=aux->letter[0];
+                if((l==letter) && (aux->visitado==false))
+                {
+                    aux->visitado=true;
+                    response=1;
+                    break;                    
+                }
+                aux=aux->next;               
+            }
+        }     
+        return response;
+    }
+
     NodeCoin *returnCoin(string letter)
     {
         if (isEmpty())
         {
-            cout << "SIN FICHAS" << endl;
+            //cout << "SIN FICHAS" << endl;
+            return NULL;
         }
         else
         {
@@ -169,8 +207,9 @@ public:
                 }
                 if(flag==0)
                 {
-                    NodeCoin* fail= new NodeCoin("2",0);
-                    return fail;                    
+                    //NodeCoin* fail= new NodeCoin("2",0);
+                    //return fail;                    
+                    return NULL;
                 }
             }
         }
@@ -230,7 +269,7 @@ public:
     //SHOW IN A PNG PICTURE THE DICTIONARY WORDS
     //********************************************
 
-    void graphListOfIndividualCoin()
+    void graphListOfIndividualCoin(string name)
     {
         string scriptGraph;
         int numNode = 0;
@@ -253,6 +292,7 @@ public:
             }
             scriptGraph += "node" + to_string(numNode);
             scriptGraph += "[label=\"" + aux->letter + "\"];\n";
+            scriptGraph += "label=\"Fichas de: "+name+"\";\n";
             scriptGraph += "}\n";
         }
         ofstream myFile;
@@ -263,6 +303,47 @@ public:
         system("shotwell ListOfIndividualCoin.png");
     }
 };
+
+/*
+int main()
+{
+    ListCoinPLayer *list  =new ListCoinPLayer();
+    list->addCoin("A",2);
+    list->addCoin("B",2);
+    list->addCoin("S",2);
+    list->addCoin("T",2);
+    list->addCoin("A",2);
+    list->addCoin("C",2);
+    list->showList();
+    cout<<"\n";
+    
+    int x = 66; //letra en ascii
+    char c = static_cast<char>(x);   
+    
+    if(list->checkLetter(c)==1)
+    {
+        cout<<"LETRA EXISTE"<<endl;        
+    }
+    else
+    {
+        cout<<"LETRA NO EXISTE"<<endl;        
+    }            
+    cout<<"\n";    
+
+    x=66;
+    c = static_cast<char>(x);       
+    if(list->checkLetter(c)==1)
+    {
+        cout<<"LETRA EXISTE"<<endl;        
+    }
+    else
+    {
+        cout<<"LETRA NO EXISTE"<<endl;        
+    }            
+    cout<<"\n";  
+    return 0;
+    
+}*/
 
 /*
 int main()

@@ -55,7 +55,7 @@ class ListWords
     //****************************************
     //DECLARATION OF ATTRIBUTES
     //****************************************
-private:
+public:
     NodeWord *first;
     NodeWord *last;
 
@@ -104,10 +104,71 @@ public:
         }
     }
 
+    bool checkWord(string word_)
+    {
+        int a;
+        bool res = false;
+        if (isEmpty())
+        {
+            res = false;            
+        }
+        else
+        {
+            NodeWord *aux = first;
+            do
+            {
+                a = check_Word(aux->word,word_);
+                if(a==0)
+                {   
+                    res=true;
+                    break;
+                }
+                aux = aux->next;
+            } while (aux != first);
+        }
+        return res;
+    }
+
     //****************************************
     //SHOW ELEMENTS OF THE LIST
     //****************************************
 private:
+    string nameToLower(string cadena)
+    {
+        for (int i = 0; i < cadena.length(); i++)
+            cadena[i] = tolower(cadena[i]);
+        return cadena;
+    }
+
+    //************************************************
+    //CHECK IF NEW NAME GOES BEFORE OR AFTER THAT ROOT
+    //************************************************
+    int check_Word(string node_word, string word_new)
+    {
+        int response = 0;
+        string current_word = nameToLower(node_word);   //name new to compare
+        string new_word = nameToLower(word_new); //root name to compare
+
+        if (current_word.compare(new_word) == 0)
+        {
+            //THE NAMES ARE SAME
+            response = 0;
+        }
+        else if (current_word.compare(new_word) > 0) // It's a right son
+        {
+            //THE NEW NAME IS THE RIGHT SONOF THE ROOT
+            //node_word goes after to word_new
+            response = 1;
+        }
+        else //It's a left son
+        {
+            //THE NEW NAME IS THE LEFT SON OF THE ROOT
+            //node_word goes befor to word_new
+            response = 2;
+        }
+        return response;
+    }
+
     void showList()
     {
         if (isEmpty())

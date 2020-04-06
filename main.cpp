@@ -2,10 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <fstream>
-#include <algorithm>    // std::shuffle
-#include <array>        // std::array
-#include <random>       // std::default_random_engine
-#include <chrono>       // std::chrono::system_clock
+#include <algorithm> // std::shuffle
+#include <array>     // std::array
+#include <random>    // std::default_random_engine
+#include <chrono>    // std::chrono::system_clock
 
 //LIBRARIES FOR GRAPHIC ENVIRONMENT
 #include <ncurses.h>
@@ -17,13 +17,12 @@
 #include "Structures/DictionaryWords.cpp" //dictionary words, OPTION 0
 #include "Structures/BoxDoubleValue.cpp"
 #include "Structures/BoxTripleValue.cpp"
-#include "Structures/QueueCoins.cpp"           // coins available, OPTION 1
-#include "Structures/UsersTree.cpp"            // player's tree, OPTION 2,3,4 AND 5
+#include "Structures/QueueCoins.cpp" // coins available, OPTION 1
+#include "Structures/UsersTree.cpp"  // player's tree, OPTION 2,3,4 AND 5
 //#include "Structures/ScoreBoardIndividual.cpp" // player score history, OPTION 6
 #include "Structures/ScoreBoardGeneral.cpp"    // General score history, OPTION 7
 #include "Structures/SparseMatrix.cpp"         // Game Board, OPTION 8
 #include "Structures/ListOfIndividualCoin.cpp" // player coins available, OPTION 9
-
 
 using namespace std;
 /******************************************************************
@@ -52,17 +51,35 @@ QueueCoin *queeucoins = new QueueCoin();      //add coind to the game board
 TreePlayer *treeplayer = new TreePlayer();    //add new player
 //pendiente para cada jugador, podria ser una lista para cada jugador en el arbol, como un atributo de cada nodo
 //ScoreboardIndividual *individualscore = new ScoreboardIndividual(); //add score for
-ScoreboardGeneral *generalscore = new ScoreboardGeneral();          //add players and their scores
-SparseMatrix *matrix = new SparseMatrix();                          // game board
-ListCoinPLayer *player1Coins = new ListCoinPLayer();                // coins player 1
-ListCoinPLayer *player2Coins = new ListCoinPLayer();                // coind player 2
-NodeTree* player1 = new NodeTree();
-NodeTree* player2 = new NodeTree();
+ScoreboardGeneral *generalscore = new ScoreboardGeneral(); //add players and their scores
+SparseMatrix *matrix = new SparseMatrix();                 // game board
+
+ListCoinPLayer *listPlayer1Coins = new ListCoinPLayer(); // coins player 1
+ListCoinPLayer *listPlayer2Coins = new ListCoinPLayer(); // coind player 2
+
+NodeTree *player1 = new NodeTree();
+NodeTree *player2 = new NodeTree();
 
 //Variables used
+
+//dimension matrix
 int dimensionMatrix = 0;
+
+//score per player
+int score_player1_global = 0;
+int score_player2_global = 0;
+
+//num coins in list
+int numCoinsPlayer1 = 0;
+int numCoinsPlayer2 = 0;
+
+//name per player
 string name_player1_global;
 string name_player2_global;
+
+//boton de finalizar y pausa
+int button_pause=0;
+string word_entered_player1_global="";
 
 //Definition of functions
 void startMenu();
@@ -76,6 +93,13 @@ void newPlayer2();
 void playerExists1();
 void playerExists2();
 void askplayer2();
+void screenGameInterface();
+void assignCoinsPlayer1();
+void assignCoinsPlayer2();
+void fillQueue();
+void iniciarCoordenada();
+int verificarLetraListPLayer1(int);
+void dibujarEnMatriz(int, int, int);
 
 //********************************************************************************
 //*************************  START MENU  *****************************************
@@ -83,13 +107,13 @@ void askplayer2();
 void startMenu()
 {
     //clean screen
-    clear();    
-    //postion x to center menu    
+    clear();
+    //postion x to center menu
     int x = 22;
     //menu header
     start_color();
     init_pair(1, COLOR_GREEN, COLOR_BLUE);   //text red, background blue
-    init_pair(2, COLOR_WHITE, COLOR_BLUE);   //text white, background blue        
+    init_pair(2, COLOR_WHITE, COLOR_BLUE);   //text white, background blue
     init_pair(3, COLOR_YELLOW, COLOR_BLUE);  //text yellow, background blue
     init_pair(4, COLOR_MAGENTA, COLOR_BLUE); //text magenta, background blue // it's ok
     init_pair(5, COLOR_RED, COLOR_BLUE);     //text red, background blue  // it's wrong
@@ -136,7 +160,7 @@ void startMenu()
     else if (inputkey == '4')
     {
         exitGame();
-    }    
+    }
     //if key is any option, stay in menu
     else
     {
@@ -227,24 +251,19 @@ void windowReadFile()
     }
 }
 
-
-
-
-
 //#################################################################################################################
 //################################# START GAME PROGRAM ############################################################
 //#################################################################################################################
-
 
 //********************************************************************************
 //*************************  START GAME  *****************************************
 //********************************************************************************
 void windowStartGame()
 {
-    clear();    
-    //postion x to center menu    
+    clear();
+    //postion x to center menu
     int x = 18;
-    //menu header    
+    //menu header
     attron(COLOR_PAIR(3) | A_BOLD);
     mvprintw(3, x, "===============================================");
     attroff(COLOR_PAIR(3));
@@ -257,10 +276,10 @@ void windowStartGame()
     mvprintw(5, x, "===============================================");
     attroff(COLOR_PAIR(3));
 
-    attron(COLOR_PAIR(5) | A_BOLD);      
-    mvprintw(6, 33, "Jugador 1 ");      
+    attron(COLOR_PAIR(5) | A_BOLD);
+    mvprintw(6, 33, "Jugador 1 ");
     attroff(COLOR_PAIR(5));
-    
+
     attron(COLOR_PAIR(2) | A_BOLD);
     mvprintw(8, x, "1. Nuevo Jugador");
     mvprintw(9, x, "2. Jugador ya registrado");
@@ -270,23 +289,23 @@ void windowStartGame()
     refresh();
     //get key enter by user
     int inputkey = getch();
-    
+
     if (inputkey == '1')
     {
         newPlayer1();
-    }    
+    }
     else if (inputkey == '2')
     {
         playerExists1();
-    }    
+    }
     else if (inputkey == '3')
     {
         startMenu();
-    }        
+    }
     else
     {
         windowStartGame();
-    }      
+    }
 }
 
 //*************************************************
@@ -295,9 +314,9 @@ void windowStartGame()
 void newPlayer1()
 {
     clear();
-    //postion x to center menu    
+    //postion x to center menu
     int x = 18;
-    //menu header    
+    //menu header
     attron(COLOR_PAIR(3) | A_BOLD);
     mvprintw(3, x, "===============================================");
     attroff(COLOR_PAIR(3));
@@ -310,17 +329,17 @@ void newPlayer1()
     mvprintw(5, x, "===============================================");
     attroff(COLOR_PAIR(3));
 
-    attron(COLOR_PAIR(2) | A_BOLD);          
-    //mvprintw(6, 33, "Jugador 1 ");     
-    mvprintw(23, x, "ESC - Regresar a Menu Inicio"); 
+    attron(COLOR_PAIR(2) | A_BOLD);
+    //mvprintw(6, 33, "Jugador 1 ");
+    mvprintw(23, x, "ESC - Regresar a Menu Inicio");
     mvprintw(7, x, "Ingrese nombre de jugador:");
-    mvprintw(8, x, "");        
-    refresh();    
-    
+    mvprintw(8, x, "");
+    refresh();
+
     //read character of keyboard
     bool flag = true;
     int key;
-    int column =18 ;
+    int column = 18;
     string name_player1;
     while (flag)
     {
@@ -331,8 +350,8 @@ void newPlayer1()
             startMenu();
         }
         else if (key == 10)
-        {           
-            if (treeplayer->serchPlayer(name_player1)==1)//name already exist
+        {
+            if (treeplayer->serchPlayer(name_player1) == 1) //name already exist
             {
                 attron(COLOR_PAIR(5)); //color red
                 mvprintw(10, x, "!!.Nombre de Jugador ya existe.!!");
@@ -343,43 +362,42 @@ void newPlayer1()
                 for (int i = 0; i < 70; i++)
                 {
                     mvaddch(10, i, 32);
-                    mvaddch(11, i, 32);                    
+                    mvaddch(11, i, 32);
                     refresh();
                 }
-                name_player1="";
-                column=18;
+                name_player1 = "";
+                column = 18;
                 newPlayer1();
             }
             else
             {
-                treeplayer->addPlayer(name_player1);                
+                treeplayer->addPlayer(name_player1);
                 name_player1_global = name_player1;
                 attron(COLOR_PAIR(5));
                 mvprintw(10, x, "!! Nombre de Jugador Valido !!");
                 mvprintw(11, x, "Presione una tecla para continuar...");
                 refresh();
                 attroff(COLOR_PAIR(5));
-                getch();     
+                getch();
                 askplayer2();
             }
         }
         else
         {
             name_player1 += char(key);
-            mvaddch(8,column,key);
+            mvaddch(8, column, key);
             refresh();
             column++;
         }
     }
-
 }
 
 void askplayer2()
 {
-    clear();    
-    //postion x to center menu    
+    clear();
+    //postion x to center menu
     int x = 18;
-    //menu header    
+    //menu header
     attron(COLOR_PAIR(3) | A_BOLD);
     mvprintw(3, x, "===============================================");
     attroff(COLOR_PAIR(3));
@@ -392,11 +410,11 @@ void askplayer2()
     mvprintw(5, x, "===============================================");
     attroff(COLOR_PAIR(3));
 
-    attron(COLOR_PAIR(5) | A_BOLD);      
-    mvprintw(6, 33, "Jugador 2 ");  
+    attron(COLOR_PAIR(5) | A_BOLD);
+    mvprintw(6, 33, "Jugador 2 ");
     attroff(COLOR_PAIR(5));
-    
-    attron(COLOR_PAIR(2));     
+
+    attron(COLOR_PAIR(2));
     mvprintw(8, x, "1. Nuevo Jugador");
     mvprintw(9, x, "2. Jugador ya registrado");
     mvprintw(10, x, "3. Regresar");
@@ -405,31 +423,31 @@ void askplayer2()
     refresh();
     //get key enter by user
     int inputkey = getch();
-    
+
     if (inputkey == '1')
     {
         newPlayer2();
-    }    
+    }
     else if (inputkey == '2')
     {
         playerExists2();
-    }    
+    }
     else if (inputkey == '3')
     {
         startMenu();
-    }        
+    }
     else
     {
         askplayer2();
-    }      
+    }
 }
 
 void newPlayer2()
 {
     clear();
-    //postion x to center menu    
+    //postion x to center menu
     int x = 18;
-    //menu header    
+    //menu header
     attron(COLOR_PAIR(3) | A_BOLD);
     mvprintw(3, x, "===============================================");
     attroff(COLOR_PAIR(3));
@@ -442,17 +460,17 @@ void newPlayer2()
     mvprintw(5, x, "===============================================");
     attroff(COLOR_PAIR(3));
 
-    attron(COLOR_PAIR(2) | A_BOLD);          
-    //mvprintw(6, 33, "Jugador 1 ");     
-    mvprintw(23, x, "ESC - Regresar a Menu Inicio"); 
+    attron(COLOR_PAIR(2) | A_BOLD);
+    //mvprintw(6, 33, "Jugador 1 ");
+    mvprintw(23, x, "ESC - Regresar a Menu Inicio");
     mvprintw(7, x, "Ingrese nombre de jugador:");
-    mvprintw(8, x, "");        
-    refresh();    
-    
+    mvprintw(8, x, "");
+    refresh();
+
     //read character of keyboard
     bool flag = true;
     int key;
-    int column =18 ;
+    int column = 18;
     string name_player2;
     while (flag)
     {
@@ -463,8 +481,8 @@ void newPlayer2()
             startMenu();
         }
         else if (key == 10)
-        {           
-            if (treeplayer->serchPlayer(name_player2)==1)//name already exist
+        {
+            if (treeplayer->serchPlayer(name_player2) == 1) //name already exist
             {
                 attron(COLOR_PAIR(5)); //color red
                 mvprintw(10, x, "!!.Nombre de Jugador ya existe.!!");
@@ -475,11 +493,11 @@ void newPlayer2()
                 for (int i = 0; i < 70; i++)
                 {
                     mvaddch(10, i, 32);
-                    mvaddch(11, i, 32);                    
+                    mvaddch(11, i, 32);
                     refresh();
                 }
-                name_player2="";
-                column=18;
+                name_player2 = "";
+                column = 18;
                 newPlayer2();
             }
             else
@@ -491,14 +509,22 @@ void newPlayer2()
                 mvprintw(11, x, "Presione una tecla para continuar...");
                 refresh();
                 attroff(COLOR_PAIR(5));
-                getch();     
-                startMenu();      //AQUI VA EL CODIGO DE LA PANTALLA DEL JUEGO           
+                getch();
+                queeucoins->clearOut();
+                fillQueue();
+                numCoinsPlayer1=0;
+                numCoinsPlayer2=0;
+                listPlayer1Coins->clearOut();          
+                listPlayer2Coins->clearOut();          
+                assignCoinsPlayer1();  
+                assignCoinsPlayer2();
+                screenGameInterface(); //start game interface
             }
         }
         else
         {
             name_player2 += char(key);
-            mvaddch(8,column,key);
+            mvaddch(8, column, key);
             refresh();
             column++;
         }
@@ -511,9 +537,9 @@ void newPlayer2()
 void playerExists1()
 {
     clear();
-    //postion x to center menu    
+    //postion x to center menu
     int x = 18;
-    //menu header    
+    //menu header
     attron(COLOR_PAIR(3) | A_BOLD);
     mvprintw(3, x, "===============================================");
     attroff(COLOR_PAIR(3));
@@ -526,17 +552,17 @@ void playerExists1()
     mvprintw(5, x, "===============================================");
     attroff(COLOR_PAIR(3));
 
-    attron(COLOR_PAIR(2) | A_BOLD);          
-    //mvprintw(6, 33, "Jugador 1 ");     
-    mvprintw(23, x, "ESC - Regresar a Menu Inicio"); 
+    attron(COLOR_PAIR(2) | A_BOLD);
+    //mvprintw(6, 33, "Jugador 1 ");
+    mvprintw(23, x, "ESC - Regresar a Menu Inicio");
     mvprintw(7, x, "Ingrese nombre para cargar su Usuario:");
-    mvprintw(8, x, "");        
-    refresh();    
-    
+    mvprintw(8, x, "");
+    refresh();
+
     //read character of keyboard
     bool flag = true;
     int key;
-    int column =18 ;
+    int column = 18;
     string name_player1_exist;
     while (flag)
     {
@@ -547,21 +573,21 @@ void playerExists1()
             startMenu();
         }
         else if (key == 10)
-        {           
-            if (treeplayer->serchPlayer(name_player1_exist)==1)//name already exist
+        {
+            if (treeplayer->serchPlayer(name_player1_exist) == 1) //name already exist
             {
                 name_player1_global = treeplayer->getName(name_player1_exist);
-                attron(COLOR_PAIR(3)); //color yellow
-                mvprintw(10, x, "Bienvenido a una nueva partida, "); //empezar en la 50 en x                
-                int a=50;
+                attron(COLOR_PAIR(3));                               //color yellow
+                mvprintw(10, x, "Bienvenido a una nueva partida, "); //empezar en la 50 en x
+                int a = 50;
                 char name[name_player1_global.length()];
                 for (int i = 0; i < sizeof(name); i++)
                 {
                     name[i] = name_player1_global[i];
-                    mvaddch(10,a, name[i]);
+                    mvaddch(10, a, name[i]);
                     refresh();
                     a++;
-                }              
+                }
                 mvprintw(11, x, "Presione una tecla para continuar....");
                 refresh();
                 getch();
@@ -575,28 +601,27 @@ void playerExists1()
                 refresh();
                 attroff(COLOR_PAIR(5));
                 getch();
-                name_player1_exist="";
-                column=18;
-                playerExists1();                
+                name_player1_exist = "";
+                column = 18;
+                playerExists1();
             }
         }
         else
         {
             name_player1_exist += char(key);
-            mvaddch(8,column,key);
+            mvaddch(8, column, key);
             refresh();
             column++;
         }
     }
-    
 }
 
 void playerExists2()
 {
     clear();
-    //postion x to center menu    
+    //postion x to center menu
     int x = 18;
-    //menu header    
+    //menu header
     attron(COLOR_PAIR(3) | A_BOLD);
     mvprintw(3, x, "===============================================");
     attroff(COLOR_PAIR(3));
@@ -609,17 +634,17 @@ void playerExists2()
     mvprintw(5, x, "===============================================");
     attroff(COLOR_PAIR(3));
 
-    attron(COLOR_PAIR(2) | A_BOLD);          
-    //mvprintw(6, 33, "Jugador 1 ");     
-    mvprintw(23, x, "ESC - Regresar a Menu Inicio"); 
+    attron(COLOR_PAIR(2) | A_BOLD);
+    //mvprintw(6, 33, "Jugador 1 ");
+    mvprintw(23, x, "ESC - Regresar a Menu Inicio");
     mvprintw(7, x, "Ingrese nombre para cargar su Usuario:");
-    mvprintw(8, x, "");        
-    refresh();    
-    
+    mvprintw(8, x, "");
+    refresh();
+
     //read character of keyboard
     bool flag = true;
     int key;
-    int column =18 ;
+    int column = 18;
     string name_player2_exist;
     while (flag)
     {
@@ -630,26 +655,33 @@ void playerExists2()
             startMenu();
         }
         else if (key == 10)
-        {           
-            if (treeplayer->serchPlayer(name_player2_exist)==1)//name already exist
+        {
+            if (treeplayer->serchPlayer(name_player2_exist) == 1) //name already exist
             {
                 name_player2_global = treeplayer->getName(name_player2_exist);
-                attron(COLOR_PAIR(3)); //color yellow
+                attron(COLOR_PAIR(3));                               //color yellow
                 mvprintw(10, x, "Bienvenido a una nueva partida, "); //empezar en la 50 en x
-                int a=50;
+                int a = 50;
                 char name[name_player2_global.length()];
                 for (int i = 0; i < sizeof(name); i++)
                 {
                     name[i] = name_player2_global[i];
-                    mvaddch(10,a, name[i]);
+                    mvaddch(10, a, name[i]);
                     refresh();
                     a++;
-                }              
+                }
                 mvprintw(11, x, "Presione una tecla para continuar....");
                 refresh();
                 getch();
-                startMenu();
-                //askplayer2(); // AQUI VA EL CODIGO DEL INICIO DEL JUEGO
+                queeucoins->clearOut();
+                fillQueue();
+                numCoinsPlayer1=0;
+                numCoinsPlayer2=0;     
+                listPlayer1Coins->clearOut();          
+                listPlayer2Coins->clearOut();          
+                assignCoinsPlayer1(); 
+                assignCoinsPlayer2();
+                screenGameInterface(); //start game interface
             }
             else
             {
@@ -659,29 +691,443 @@ void playerExists2()
                 refresh();
                 attroff(COLOR_PAIR(5));
                 getch();
-                name_player2_exist="";
-                column=18;
-                playerExists2();                
+                name_player2_exist = "";
+                column = 18;
+                playerExists2();
             }
         }
         else
         {
             name_player2_exist += char(key);
-            mvaddch(8,column,key);
+            mvaddch(8, column, key);
             refresh();
             column++;
         }
     }
 }
+
+//*************************************************
+//fill list of players
+//*************************************************
+
+void assignCoinsPlayer1()
+{    
+    string letter;
+    int value;
+    while (numCoinsPlayer1 < 7)
+    {
+        if (queeucoins->numElements() == 0)
+        {
+            break;
+        }
+        else
+        {
+            NodeCoinQueue *res = queeucoins->dequeueCoin();
+            letter = res->letter;
+            value = res->value;
+            listPlayer1Coins->addCoin(letter, value);
+            numCoinsPlayer1++;
+        }
+    }        
+}
+
+void assignCoinsPlayer2()
+{    
+    string letter;
+    int value;
+    while (numCoinsPlayer2 < 7)
+    {
+        if (queeucoins->numElements() == 0)
+        {
+            break;
+        }
+        else
+        {
+            NodeCoinQueue *res = queeucoins->dequeueCoin();
+            letter = res->letter;
+            value = res->value;
+            listPlayer2Coins->addCoin(letter, value);
+            numCoinsPlayer2++;
+        }
+    }    
+}
+
+//*************************************************
+//Game Interface
+//*************************************************
+void screenGameInterface()
+{
+    clear();
+    //postion x to center menu
+    int x = 18;
+    //menu header
+    attron(COLOR_PAIR(1) | A_BOLD);
+    mvprintw(0, 0, "================================================================================");
+    attroff(COLOR_PAIR(1));
+
+    attron(COLOR_PAIR(5) | A_BOLD);
+    mvprintw(1, 34, "SCRABBLE");
+    attroff(COLOR_PAIR(5));
+
+    attron(COLOR_PAIR(1) | A_BOLD);
+    mvprintw(2, 0, "================================================================================");
+    attroff(COLOR_PAIR(1));
+
+    attron(COLOR_PAIR(5) | A_BOLD);
+    mvprintw(23, 0, "ESC - Finalizar Partida");
+    attroff(COLOR_PAIR(4));
+
+    attron(COLOR_PAIR(5) | A_BOLD);
+    mvprintw(23, 35, "F1 - Pausar Partida e ir al Menu Principal");
+    attroff(COLOR_PAIR(4));
+
+    attron(COLOR_PAIR(3) | A_BOLD);
+    mvprintw(4, 0, "Turno de: ");
+    attroff(COLOR_PAIR(3));
+
+    attron(COLOR_PAIR(2) | A_BOLD);
+    int a = 10;
+    char name[name_player1_global.length()];
+    for (int i = 0; i < sizeof(name); i++)
+    {
+        name[i] = name_player1_global[i];
+        mvaddch(4, a, name[i]);
+        refresh();
+        a++;
+    }
+    attroff(COLOR_PAIR(2));
+
+    attron(COLOR_PAIR(3) | A_BOLD);
+    mvprintw(5, 0, "Punteo: ");
+    attroff(COLOR_PAIR(3));
+
+    attron(COLOR_PAIR(2) | A_BOLD);
+    string punteo1 = to_string(score_player1_global);
+    a = 8;
+    char name2[punteo1.length()];
+    for (int i = 0; i < sizeof(name2); i++)
+    {
+        name2[i] = punteo1[i];
+        mvaddch(5, a, name2[i]);
+        refresh();
+        a++;
+    }
+    attroff(COLOR_PAIR(2));
+
+
+    attron(COLOR_PAIR(3) | A_BOLD);
+    mvprintw(6, 0, "Fichas Disponibles: ");
+    attron(COLOR_PAIR(2) | A_BOLD);
+    int b = 20; //espacio de 3
+    
+    if (listPlayer1Coins->isEmpty())
+    {
+        mvprintw(23, 25, "No hay Fichas Disponibles ");
+        refresh();
+    }
+    else
+    {
+        NodeCoin *aux = listPlayer1Coins->first;
+        if (listPlayer1Coins->first->next == NULL)
+        {
+            mvaddch(6, b, listPlayer1Coins->first->letter[0]);
+            refresh();
+            b+=3;
+        }
+        while (aux->next != NULL)
+        {
+            if (aux == listPlayer1Coins->first)
+            {
+                mvaddch(6, b, aux->letter[0]);
+                refresh();
+                b+=3;
+            }
+            else
+            {
+                mvaddch(6, b, aux->letter[0]);
+                refresh();
+                b+=3;
+            }
+            aux = aux->next;
+        }
+        if (aux != listPlayer1Coins->first)
+        {
+            mvaddch(6, b, aux->letter[0]);
+            refresh();
+            b+=3;
+        }
+    }
+    attroff(COLOR_PAIR(2));
+
+    attron(COLOR_PAIR(3) | A_BOLD);
+    mvprintw(8, 0, "Ingrese Palabra que desea Jugar, Usando las fichas disponibles: ");
+    mvprintw(9,0,"");
+    attroff(COLOR_PAIR(3));
+    refresh();
+    
+    bool bool_verificar_letra=true;
+    bool flag = true;
+    int key;
+    int column = 0;
+    string word_entered;
+    while (flag)
+    {
+        //get key enter by user
+        key = getch();
+        if (key == 27) //ESC return to menu
+        {
+            startMenu();
+        }
+        else if (key==KEY_F(1))
+        {            
+            button_pause=1;   
+            startMenu();            
+        }        
+        else if (key == 10)
+        {
+            bool resp = dictionarywords->checkWord(word_entered);
+            if((resp==true) && (bool_verificar_letra==true))
+            {
+                word_entered_player1_global = word_entered;                
+                attron(COLOR_PAIR(4) | A_BOLD);
+                mvprintw(11, 25, "Palabra Correcta");                                
+                refresh();
+                attroff(COLOR_PAIR(4));
+                getch();
+                for (int i = 0; i < 70; i++)
+                {                    
+                    mvaddch(11, i, 32);
+                    refresh();
+                }
+                iniciarCoordenada();
+                //screenGameInterface();
+            }
+            else
+            {
+                attron(COLOR_PAIR(4) | A_BOLD);
+                mvprintw(11, 10, "Palabra NO Existe o Letras Insuficientes");
+                mvprintw(12, 10, "Presione una tecla para intentar de nuevo...");
+                refresh();
+                attroff(COLOR_PAIR(4));
+                getch();
+                screenGameInterface();                
+            }
+        }
+        else
+        {
+            if(verificarLetraListPLayer1(key)==0)
+            {
+                bool_verificar_letra=false; //letra no existe
+            }
+            attron(COLOR_PAIR(2) | A_BOLD);
+            word_entered += char(key);
+            mvaddch(9, column, key);
+            refresh();
+            column++;
+            attroff(COLOR_PAIR(2));
+        }
+    }
+}
+
+int verificarLetraListPLayer1(int letra)
+{
+    int x=letra;
+    char c = static_cast<char>(x);
+    int res=0;
+    if(listPlayer1Coins->checkLetter(c)==1)
+    {
+        //letra existe
+        res=1;
+    }
+    else
+    {
+        res=0;
+        //letra no existe
+    }
+    return res;
+}
+
+
+void iniciarCoordenada()
+{
+    int pos_x=0;
+    int pos_y=0;
+    //limpiar las lineas de informacion
+    for (int i = 0; i < 70; i++)
+    {
+        mvaddch(11, i, 32);
+        mvaddch(12, i, 32);
+        mvaddch(13, i, 32);
+        mvaddch(14, i, 32);
+        mvaddch(15, i, 32);
+        refresh();
+    }
+
+    attron(COLOR_PAIR(3) | A_BOLD);
+    mvprintw(11, 0, "Coordenada de Inicio, (Coordenada Maxima: ");                   
+    
+    string dimension = to_string(dimensionMatrix);
+    int j = 42;
+    char name2[dimension.length()];
+    for (int i = 0; i < sizeof(name2); i++)
+    {
+        name2[i] = dimension[i];
+        mvaddch(11, j, name2[i]);
+        refresh();
+        j++;
+    }
+    mvaddch(11, j,')');       
+    mvprintw(12, 0, "Coordenada X (Fila): ");     
+    refresh();
+    attroff(COLOR_PAIR(3));
+    
+    //pedir coordenada en x
+    bool flag = true;
+    int key;
+    int column = 21;
+    string pos_entered="";
+    //string word_entered="123";
+    //key = stoi(word_entered); convert string to int
+    while (flag)
+    {
+        //get key enter by user
+        key = getch();
+        if (key == 10) 
+        {
+            pos_x=stoi(pos_entered);            
+            flag=false;
+        }    
+        else if(key>=48 && key<=57)    
+        {
+            attron(COLOR_PAIR(2) | A_BOLD);
+            pos_entered += char(key);
+            mvaddch(12, column, key);
+            refresh();
+            column++;
+            attroff(COLOR_PAIR(2));
+        }
+        else
+        {
+            flag=true;
+        }
+    }
+
+    attron(COLOR_PAIR(3) | A_BOLD);
+    //pedir coordenada en x
+    mvprintw(13, 0, "Coordenada Y (Columna): ");       
+    refresh();
+    attroff(COLOR_PAIR(3));
+    flag = true;     
+    column = 24;
+    pos_entered="";
+    //string word_entered="123";
+    //key = stoi(word_entered); convert string to int
+    while (flag)
+    {
+        //get key enter by user
+        key = getch();
+        if (key == 10) //ESC return to menu
+        {
+            pos_y=stoi(pos_entered);            
+            flag=false;
+        }   
+        else if(key>=48 && key<=57)    
+        {
+            attron(COLOR_PAIR(2) | A_BOLD);
+            pos_entered += char(key);
+            mvaddch(13, column, key);
+            refresh();
+            column++;
+            attroff(COLOR_PAIR(2));
+        }
+        else
+        {
+            flag=true;
+        }     
+    }
+
+    //comparar los valores ingresados con el valor de la matriz
+    if(pos_x<=dimensionMatrix && pos_y<=dimensionMatrix)
+    {
+        attron(COLOR_PAIR(4) | A_BOLD);
+        mvprintw(14, 20, "Coordenada de Inicio Valida");               
+        refresh();        
+        attroff(COLOR_PAIR(4));
+        
+        attron(COLOR_PAIR(3) | A_BOLD);
+        mvprintw(15, 0, "(H) Horizontal *** (V) Vertical:");       
+        attroff(COLOR_PAIR(3));
+        
+        int posic=0; // 0 = horizontal; 1=vertical
+        attron(COLOR_PAIR(3) | A_BOLD);
+        mvprintw(15, 34, "");       
+        refresh();                
+        int key12 = getch();   
+
+        if(key12== 72 || key12==104) // h
+        {
+            posic=0;
+            mvaddch(15, 34, 72);
+            refresh();
+            getch();
+        }
+        if(key12==86 || key12==118) //v
+        {
+            posic=1;
+            mvaddch(15, 34, 86);
+            refresh();
+            getch();
+        }
+        dibujarEnMatriz(pos_x, pos_y, posic);        
+    }   
+    else
+    {
+        attron(COLOR_PAIR(4) | A_BOLD);
+        mvprintw(14, 20, "Coordenadas Sobrepasan el Limite");       
+        refresh();
+        attroff(COLOR_PAIR(4));
+        getch();
+        iniciarCoordenada();
+    } 
+
+    //validar la coordenada de inicio
+    //screenGameInterface();
+}
+
+void dibujarEnMatriz(int fila, int columna, int posicionPalabra)
+{       
+    char word[word_entered_player1_global.length()];    
+    if(posicionPalabra==0)// palabra horizontal
+    {
+        for (int i = 0; i < sizeof(word); i++)
+        {
+            word[i] = word_entered_player1_global[i];
+            NodeCoinMatrix *letra = new NodeCoinMatrix();
+            letra->letter=word[i];            
+            //verificar cada coordenada y ver si es triple o doble
+            //sacar letras de la lista
+            //sumas punteo
+            matrix->add(columna+i,fila,letra); //primero va columna, luego fila
+        }       
+        
+    }
+    else
+    {
+        for (int i = 0; i < sizeof(word); i++)
+        {
+            word[i] = word_entered_player1_global[i];
+            NodeCoinMatrix *letra = new NodeCoinMatrix();
+            letra->letter=word[i];            
+            matrix->add(columna,fila+i,letra); //primero va columna, luego fila
+        }
+    }  
+    matrix->graficarMatriz();
+}
+
+
 //#################################################################################################################
 //################################# END GAME PROGRAM ##############################################################
 //#################################################################################################################
-
-
-
-
-
-
 
 //********************************************************************************
 //*************************  DATA STRUCTURE REPORT  ******************************
@@ -715,7 +1161,7 @@ void windowReports()
     mvprintw(10, x, "6) Lista Simple Ordenada: Historial de Puntaje Por Jugador");
     mvprintw(11, x, "7) Lista SImple Ordenada: Scoreboard");
     mvprintw(12, x, "8) Matriz Dispersa: Tablero");
-    mvprintw(13, x, "9) Listas Doblemente Enlaadas: Fichas por Jugador");
+    mvprintw(13, x, "9) Listas Doblemente Enlazadas: Fichas por Jugador");
     attron(COLOR_PAIR(3));
     mvprintw(14, x, "===============================================================");
     attroff(COLOR_PAIR(3));
@@ -1114,7 +1560,7 @@ void windowReports()
     //show coins per player, OPTION 9
     else if (key == 57)
     {
-        if (player1Coins->isEmpty() && player2Coins->isEmpty())
+        if (listPlayer1Coins->isEmpty() && listPlayer2Coins->isEmpty())
         {
             //clean information line
             for (int i = 0; i < 70; i++)
@@ -1153,18 +1599,18 @@ void windowReports()
             refresh();
             attroff(COLOR_PAIR(5));
             //show graphic
-            if (player1Coins->isEmpty())
+            if (listPlayer1Coins->isEmpty())
             {
-                player2Coins->graphListOfIndividualCoin();
+                listPlayer2Coins->graphListOfIndividualCoin(name_player2_global);
             }
-            else if (player2Coins->isEmpty())
+            else if (listPlayer2Coins->isEmpty())
             {
-                player1Coins->graphListOfIndividualCoin();
+                listPlayer1Coins->graphListOfIndividualCoin(name_player1_global);
             }
             else
             {
-                player1Coins->graphListOfIndividualCoin();
-                player2Coins->graphListOfIndividualCoin();
+                listPlayer1Coins->graphListOfIndividualCoin(name_player1_global);
+                listPlayer2Coins->graphListOfIndividualCoin(name_player2_global);
             }
             //return report menu
             windowReports();
@@ -1255,132 +1701,139 @@ bool readJSON(string file_name)
 void fillQueue()
 {
     //definition of the arrays of letters
-    array<char,96> foo {
-     'A','A','A','A','A','A','A','A','A','A','A','A',
-     'B','B',
-     'C','C','C','C',
-     'D','D','D','D','D',
-     'E','E','E','E','E','E','E','E','E','E','E','E',
-     'F',
-     'G','G',
-     'H','H',
-     'I','I','I','I','I','I',
-     'J',
-     'K',
-     'L','L','L','L',
-     'M','M',
-     'N','N','N','N','N',     
-     'O','O','O','O','O','O','O','O','O',
-     'P','P',
-     'Q',
-     'R','R','R','R','R',
-     'S','S','S','S','S','S',
-     'T','T','T','T',
-     'U','U','U','U','U',
-     'V',
-     'W',
-     'X',
-     'Y',
-     'Z',};
-  // obtain a time-based seed:
-  unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-  shuffle (foo.begin(), foo.end(), std::default_random_engine(seed));    
-  for (char& x: foo)
-  {
-    switch (x)
+    array<char, 96> foo{
+        'A','A','A','A','A','A','A','A','A','A','A','A',
+        'B','B',
+        'C','C','C','C',
+        'D','D','D','D','D',
+        'E','E','E','E','E','E','E','E','E','E','E','E',
+        'F',
+        'G','G',
+        'H','H',
+        'I','I','I','I','I','I',
+        'J',
+        'K',
+        'L','L','L','L',
+        'M','M',
+        'N','N','N','N','N',
+        'O','O','O','O','O','O','O','O','O',
+        'P','P',
+        'Q',
+        'R','R','R','R','R',
+        'S','S','S','S','S','S',
+        'T','T','T','T',
+        'U','U','U','U','U',
+        'V',
+        'W',
+        'X',
+        'Y',
+        'Z',
+    };
+    // obtain a time-based seed:
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    shuffle(foo.begin(), foo.end(), std::default_random_engine(seed));
+    for (char &x : foo)
     {
+        switch (x)
+        {
         case 'A':
-                queeucoins->enqueueCoin("A",1);
-                break;            
+            queeucoins->enqueueCoin("A", 1);
+            break;
         case 'B':
-                queeucoins->enqueueCoin("B",3);
-                break;            
+            queeucoins->enqueueCoin("B", 3);
+            break;
         case 'C':
-                queeucoins->enqueueCoin("C",3);
-                break;            
+            queeucoins->enqueueCoin("C", 3);
+            break;
         case 'D':
-                queeucoins->enqueueCoin("D",2);
-                break;            
+            queeucoins->enqueueCoin("D", 2);
+            break;
         case 'E':
-                queeucoins->enqueueCoin("E",1);
-                break;            
+            queeucoins->enqueueCoin("E", 1);
+            break;
         case 'F':
-                queeucoins->enqueueCoin("F",4);
-                break;            
+            queeucoins->enqueueCoin("F", 4);
+            break;
         case 'G':
-                queeucoins->enqueueCoin("G",2);
-                break;            
+            queeucoins->enqueueCoin("G", 2);
+            break;
         case 'H':
-                queeucoins->enqueueCoin("H",4);
-                break;            
+            queeucoins->enqueueCoin("H", 4);
+            break;
         case 'I':
-                queeucoins->enqueueCoin("I",1);
-                break;            
+            queeucoins->enqueueCoin("I", 1);
+            break;
         case 'J':
-                queeucoins->enqueueCoin("J",8);
-                break;            
+            queeucoins->enqueueCoin("J", 8);
+            break;
         case 'K':
-                queeucoins->enqueueCoin("K",5);
-                break;            
+            queeucoins->enqueueCoin("K", 5);
+            break;
         case 'L':
-                queeucoins->enqueueCoin("L",1);
-                break;            
+            queeucoins->enqueueCoin("L", 1);
+            break;
         case 'M':
-                queeucoins->enqueueCoin("M",3);
-                break;            
+            queeucoins->enqueueCoin("M", 3);
+            break;
         case 'N':
-                queeucoins->enqueueCoin("N",1);
-                break;            
+            queeucoins->enqueueCoin("N", 1);
+            break;
         case 'O':
-                queeucoins->enqueueCoin("O",1);
-                break;            
+            queeucoins->enqueueCoin("O", 1);
+            break;
         case 'P':
-                queeucoins->enqueueCoin("P",3);
-                break;            
+            queeucoins->enqueueCoin("P", 3);
+            break;
         case 'Q':
-                queeucoins->enqueueCoin("Q",5);
-                break;            
+            queeucoins->enqueueCoin("Q", 5);
+            break;
         case 'R':
-                queeucoins->enqueueCoin("R",1);
-                break;            
+            queeucoins->enqueueCoin("R", 1);
+            break;
         case 'S':
-                queeucoins->enqueueCoin("S",1);
-                break;            
+            queeucoins->enqueueCoin("S", 1);
+            break;
         case 'T':
-                queeucoins->enqueueCoin("T",1);
-                break;            
+            queeucoins->enqueueCoin("T", 1);
+            break;
         case 'U':
-                queeucoins->enqueueCoin("U",1);
-                break;            
+            queeucoins->enqueueCoin("U", 1);
+            break;
         case 'V':
-                queeucoins->enqueueCoin("V",4);
-                break;            
+            queeucoins->enqueueCoin("V", 4);
+            break;
         case 'W':
-                queeucoins->enqueueCoin("W",4);
-                break;            
+            queeucoins->enqueueCoin("W", 4);
+            break;
         case 'X':
-                queeucoins->enqueueCoin("X",8);
-                break;            
+            queeucoins->enqueueCoin("X", 8);
+            break;
         case 'Y':
-                queeucoins->enqueueCoin("Y",4);
-                break;            
+            queeucoins->enqueueCoin("Y", 4);
+            break;
         case 'Z':
-                queeucoins->enqueueCoin("Z",10);
-                break;            
+            queeucoins->enqueueCoin("Z", 10);
+            break;
         default:
-                break;
-    }     
-  }  
+            break;
+        }
+    }
 }
 
 int main()
-{    
+{
+    
     initscr();
     raw();
     keypad(stdscr, TRUE);
     noecho();
     clear();
-    fillQueue();
+    //fillQueue();
+    //queeucoins->graphQueue();
+    //assignCoinsPlayer1();
+    //listPlayer1Coins->graphListOfIndividualCoin();
+    //queeucoins->graphQueue();
     startMenu();
+    
     return 0;
 }

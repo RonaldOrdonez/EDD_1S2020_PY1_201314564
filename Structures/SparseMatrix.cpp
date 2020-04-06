@@ -156,7 +156,7 @@ class SparseMatrix
                     temp->right = new_temp;
                     new_temp->left = temp;                
                 }
-                //add in the middle of the list
+                //add in the middle of the list if node doesn't exist
                 else if(temp->right != NULL && temp->right->x != x)
                 {
                     NodeMatrix *new_temp = new NodeMatrix(x,0,NULL);  // create new node with value x
@@ -214,7 +214,7 @@ class SparseMatrix
 +++++++++++++++++++++++++++++++++++++++ ADD NEW NODE +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
  
-        //ADD NODE IN AXIS "X"
+        //ADD NODE IN AXIS "X" - COLUMNS
         void add_node_posX(NodeMatrix* new_node, int x, int y)
         {
             NodeMatrix *temp = head;
@@ -232,7 +232,7 @@ class SparseMatrix
             //hay x lo menos un nodo
             else{
                 //verificar si el primer nodo de la lista es mayor que el que quiero insertar y si es TRUE, lo inserto antes
-                if(temp->down->y > y){
+                if((temp->down->y > y)){
                     NodeMatrix *aux = temp->down;
                     new_node->down = aux;
                     aux->up = new_node;
@@ -242,8 +242,9 @@ class SparseMatrix
                 //sino se inserta a la primera 
                 else{
                     //avanza hasta que "y" sea menor que el aux->down
-                    NodeMatrix *aux = temp;
-                    while((aux->down!=NULL) && (aux->down->y < y)){
+                    NodeMatrix *aux = temp;                    
+                    while((aux->down!=NULL) && (aux->down->y < y))
+                    {
                         aux=aux->down;
                     }
                     //si llego al final de la lista, significa que el aux->down es null y agrega el new_node al final de la lista
@@ -253,10 +254,12 @@ class SparseMatrix
                     }
                     //sino la insercion se realiza en medio de la lista
                     else{
-                        new_node->down = aux->down;
-                        aux->down->up = new_node;
-                        aux->down = new_node;
-                        new_node->up = aux;
+                                              
+                            new_node->down = aux->down;
+                            aux->down->up = new_node;
+                            aux->down = new_node;
+                            new_node->up = aux;
+                                                                                            
                     }
                 }             
             }                         
@@ -287,28 +290,33 @@ class SparseMatrix
                     new_node->left = temp;
                 }
                 //sino se inserta a la primera 
-                else{
+                else
+                {
                     //avanza hasta que "y" sea menor que el aux->down
                     NodeMatrix *aux = temp;
-                    while((aux->right!=NULL) && (aux->right->x < x)){
+                    while((aux->right!=NULL) && (aux->right->x < x))
+                    {
                         aux=aux->right;
                     }
                     //si llego al final de la lista, significa que el aux->down es null y agrega el new_node al final de la lista
-                    if(aux->right == NULL){
+                    if(aux->right == NULL)
+                    {
                         aux->right = new_node;
                         new_node->left = aux;
                     }
                     //sino la insercion se realiza en medio de la lista
-                    else{
+                    else
+                    {                        
                         new_node->right = aux->right;
                         aux->right->left = new_node;
                         aux->right = new_node;
                         new_node->left = aux;
                     }
-                }             
-            }                 
+                }
+            }             
+        }                 
                       
-        }
+        
 
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 +++++++++++++++++++++++++++++++++++++++++ PRINT HEADERS +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -574,12 +582,13 @@ class SparseMatrix
 /*****************************************************************************************************************
 ############################################# PRINCIPAL METHOD####################################################
 ******************************************************************************************************************/
+
 /*
 main()
 {
     SparseMatrix *matrix = new SparseMatrix;
     NodeCoinMatrix* tp=new NodeCoinMatrix("O",2);    
-    matrix->add(8,5,tp);
+    matrix->add(8,5,tp); //add(columna, fila, contenido)
 
     NodeCoinMatrix* tp2=new NodeCoinMatrix("S",4);    
     matrix->add(9,5,tp2);
@@ -595,6 +604,9 @@ main()
 
     NodeCoinMatrix* tp6=new NodeCoinMatrix("A",3);    
     matrix->add(10,7,tp6);   
+
+    NodeCoinMatrix* tp7=new NodeCoinMatrix("Z",5);    
+    matrix->add(10,4,tp7);
 
     
     //matrix->printHeaders();
