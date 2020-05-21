@@ -224,7 +224,7 @@ int main()
     list->enqueueCoin("V",4);   
     cout<<"\n";
     list->showList();
-    list->graphQueue();
+    //list->graphQueue();
     //NodeCoinQueue* pop = list->dequeueCoin();
     //cout<<"Nodo sacado: "<<pop->letter<<endl;
     //list->showList();

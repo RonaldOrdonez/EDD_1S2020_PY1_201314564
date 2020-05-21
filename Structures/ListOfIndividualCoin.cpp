@@ -140,6 +140,35 @@ public:
         return response;
     }
 
+    NodeCoin* returnCoinOnly()
+    {
+        if(first->next==NULL)
+        {
+            NodeCoin *tmp = first;
+            first->next=NULL;
+            first->previous=NULL;
+            first=NULL;
+            return tmp;
+        }
+        else if(isEmpty())
+        {
+            return NULL;
+        }
+        else
+        {
+            NodeCoin *tmp = first;
+            while (tmp->next != NULL)
+            {
+                tmp = tmp->next;
+            }
+
+            NodeCoin* aux = tmp->previous;
+            aux->next = NULL;
+            return tmp;          
+        }          
+    }
+
+
     NodeCoin *returnCoin(string letter)
     {
         if (isEmpty())

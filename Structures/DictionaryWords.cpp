@@ -72,6 +72,12 @@ public:
         last = NULL;
     }
 
+    void clearOut()
+    {
+        first=NULL;
+        last=NULL;
+    }
+
     //****************************************
     //RETURN TRUE IF LIST IS EMPTY
     //****************************************
@@ -117,7 +123,7 @@ public:
             NodeWord *aux = first;
             do
             {
-                a = check_Word(aux->word,word_);
+                a = check_Word(aux->word, word_);
                 if(a==0)
                 {   
                     res=true;
@@ -132,7 +138,7 @@ public:
     //****************************************
     //SHOW ELEMENTS OF THE LIST
     //****************************************
-private:
+public:
     string nameToLower(string cadena)
     {
         for (int i = 0; i < cadena.length(); i++)
@@ -236,6 +242,15 @@ int main()
     list->addWord("UNO");    
     cout<<"\n";
     list->showList();
-    list->graphDictinary();
+    if(list->checkWord("HOLA"))
+    {
+        cout<<"ENCONTRADO";
+    }
+    else
+    {
+        cout<<"NADA";
+    }
+    
     return 0;
-}*/
+}
+*/

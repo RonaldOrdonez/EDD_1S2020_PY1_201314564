@@ -110,6 +110,14 @@ class SparseMatrix
             head = temp;
         }
 
+        //CLEAR MATRIX
+
+        void clearOut()
+        {
+            head->right=NULL;
+            head->down=NULL;                       
+        }
+
         //RETURN TRUE IF MATRIX IS EMPTY
         bool isEmpty()
         {

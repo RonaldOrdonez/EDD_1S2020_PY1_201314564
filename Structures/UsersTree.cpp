@@ -156,7 +156,7 @@ public:
     //***************************************************
     //GRAPH THE LIST IN A PNG PICTURE
     //***************************************************
-    void graphScoreIndividual()
+    void graphScoreIndividual(string nombre_jugador)
     {
         string scriptGraph;
         int numNode = 0;
@@ -184,7 +184,7 @@ public:
             scriptGraph += "node";
             scriptGraph += to_string(numNode);
             scriptGraph += "[label=\"" + to_string(aux->score) + "\"]; \n";
-            scriptGraph += "label=\"Puntaje de " + name + "\";\n";
+            scriptGraph += "label=\"Puntaje de " + nombre_jugador + "\";\n";
             scriptGraph += "}";
         }
         ofstream myFile;
@@ -324,6 +324,30 @@ public:
             res=1; //if name exists return 1
         }        
         return res;       
+    }
+
+    NodeTree* searchPlayerAndReturn(string name)
+    {
+        NodeTree* n;
+        n=recursiveSearchPlayer(root, name);
+        if(n==NULL)
+        {
+            return NULL;            
+        }
+        else
+        {
+            return n;            
+        }        
+    }
+
+    void searchPlayerAndAddScore(string name, int score)
+    {
+        NodeTree* n;        
+        n=recursiveSearchPlayer(root, name);
+        if(n!=NULL)
+        {
+            n->list->addScore(score);
+        }       
     }
 
     //***************************************

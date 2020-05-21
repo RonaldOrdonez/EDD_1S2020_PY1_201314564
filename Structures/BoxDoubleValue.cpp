@@ -131,13 +131,9 @@ public:
         {
             if((tmp->position_x==x) && (tmp->position_y==y))
             {
-                response=true;
-                tmp=tmp->next;
-            }
-            else
-            {
-                tmp=tmp->next;
-            }            
+                response=true;                
+            }           
+            tmp=tmp->next;            
         }        
         return response;
     }
